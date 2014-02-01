@@ -4,9 +4,11 @@
 
 ########## Variables
 
-dir = $( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )                    # dotfiles directory
-olddir = "$HOME/dotfiles_old"             # old dotfiles backup directory
-files = ".vimrc .vim .zshrc .pythonrc .vim_python_style"    # list of files/folders to symlink in homedir
+dir=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )                    # dotfiles directory
+olddir="$HOME/dotfiles_old"             # old dotfiles backup directory
+files=('.vimrc' '.vim' '.zshrc' '.pythonrc' '.vim_python_style')    # list of files/folders to symlink in homedir
+
+echo "we are in $dir"
 
 ##########
 
