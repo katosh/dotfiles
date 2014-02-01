@@ -9,7 +9,7 @@
 # list of files/folders to symlink in homedir
 files=('.vimrc' '.vim' '.zshrc' '.pythonrc' '.vim_python_style')
 # dotfiles directory
-dir=$0
+dir=${0%/*}
 # old dotfiles backup directory
 olddir="$HOME/dotfiles_old"
 
@@ -22,9 +22,7 @@ mkdir -p $olddir
 # move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks
 echo "Moving any existing dotfiles from $HOME to $olddir"
 for file in $files; do
-    if [ -f $HOME/$file ]; then
-        mv $HOME/$file $olddir
-    fi
+    mv $HOME/$file $olddir
     echo "Creating symlink to $file in home directory."
     ln -s $dir/$file $HOME/
 done
