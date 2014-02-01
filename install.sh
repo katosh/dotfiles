@@ -1,7 +1,9 @@
 #!/bin/zsh
 
 # this script will automaticly install the dotfiles from the repo and back up the old ones
-# to execute just type ./install.sh
+# to execute type:
+# chmod u+x install.sh
+# ./install.sh
 
 ########## Variables
 # list of files/folders to symlink in homedir
