@@ -119,7 +119,7 @@ else
 fi
 
 # Tockens
-if [ -f $HOME/.tokens ]; then $HOME/.tokens; fi
+if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
 
 # mutt emaul client
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
@@ -127,6 +127,6 @@ export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
 
 # for the symmetry project
-if [ -f $HOME/Symmetry]; then
+if [ -f $HOME/Symmetry ]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
 fi
