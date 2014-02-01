@@ -4,3 +4,4 @@ To install them you need to make the installation script executable and run it w
 chmod +x install.sh
 ./install.sh
 ```
+If there already are some configuration files in your home directory they are stored in a new folder called dotfiles_old in the same place.
