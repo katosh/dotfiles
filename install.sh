@@ -7,7 +7,7 @@
 # list of files/folders to symlink in homedir
 files=('.vimrc' '.vim' '.zshrc' '.pythonrc' '.vim_python_style')
 # dotfiles directory
-dir=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
+dir=$0
 # old dotfiles backup directory
 olddir="$HOME/dotfiles_old"
 
