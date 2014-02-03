@@ -45,10 +45,12 @@ if [ "$TERM" != "dumb" ]; then
     alias llh='ls -lh'
 fi
 
+# aliases for most used calls
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep'
+alias v='vim'
 
 # ssh aliases
 alias Mi='ssh -X mi'
@@ -88,6 +90,10 @@ alias gpl='git pull'
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
+    if [ source-highlight ]; then
+        export LESSOPEN="| source-highlight %s"
+        export LESS=' -R '
+    fi
 
 
 #### MAC OSX ####
@@ -103,6 +109,11 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/usr/local/bin:$PATH"
     # LaTex progs
     export PATH="$PATH:/usr/texbin"
+    # syntax-highlight for less if installed
+    if [ source-highlight ]; then
+        export LESSOPEN="| source-highlight --style-file=esc-solarized.style -f esc -i %s"
+        export LESS=' -R '
+    fi
 
 
 #### CYG-WIN ###
@@ -130,3 +141,4 @@ export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
 if [ -f $HOME/Symmetry ]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
 fi
+
