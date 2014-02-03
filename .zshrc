@@ -78,7 +78,7 @@ export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 
 # git aliases
 alias gco='git ccheckout'
-alias gci='git commit'
+alias gci='git commit -am'
 alias grb='git rebase'
 alias gpu='git push'
 alias gpl='git pull'
