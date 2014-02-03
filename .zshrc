@@ -63,7 +63,7 @@ Pii(){
 alias tmux="tmux -2"
 
 # display most used commands
-alias mostused='history|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -r'
+alias mostused='fc -l -1 1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -r|head -16'
 
 # autocorrection for commands on return
 setopt correct
