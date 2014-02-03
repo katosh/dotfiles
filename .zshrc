@@ -103,12 +103,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [ -f /Applications/Blender/blender.app ]; then
         alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
     fi
-    # fix PATH
-    export PATH="/usr/sbin:$PATH"
-    export PATH="/usr/local/sbin:$PATH"
-    export PATH="/usr/local/bin:$PATH"
-    # LaTex progs
-    export PATH="$PATH:/usr/texbin"
     # syntax-highlight for less if installed
     if [ source-highlight ]; then
         export LESSOPEN="| source-highlight --style-file=esc-solarized.style -f esc -i %s"
