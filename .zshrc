@@ -5,14 +5,14 @@ SAVEHIST=5000
 setopt appendhistory autocd extendedglob notify
 unsetopt beep
 bindkey -v
-# End of lines configured by zsh-newuser-install
-# The following lines were added by compinstall
 zstyle :compinstall filename '/Users/dominik/.zshrc'
 
 autoload -Uz compinit
 compinit
-# End of lines added by compinstall
-#
+
+# costemize promt
+PROMPT='%U%n:%m%u %/> '
+
 # Cache completion for better preformance
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
@@ -32,12 +32,7 @@ zstyle ':completion:*:cd:*' ignore-parents parent pwd
 
 # enable color support of ls and also add handy aliases
 if [ "$TERM" != "dumb" ]; then
-	#eval "`dircolors -b`"
-	#alias dir='ls --color=auto --format=vertical'
-	#alias vdir='ls --color=auto --format=long'
-    # some more ls aliases
     alias ls='ls -G'
-    alias ll='ls -l'
     #alias l='ls -CF'
     alias la='ls -a'
     alias ll='ls -lA'          # ohne . und ..
@@ -48,6 +43,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep'
+
 # ssh aliases
 alias Mi='ssh -X mi'
 alias Pi='ssh -X pi'
@@ -56,18 +52,15 @@ Pii(){
     rip=`lynx --dump http://userpage.fu-berlin.de/katosh/piip.txt | xargs -n 1 | tail -1`
     ssh pi@$rip
 }
+
 # tmux 256 color support
 alias tmux="tmux -2"
 
-### small tools
 # display most used commands
 alias mostused='history|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -r'
 
 # autocorrection for commands on return
 setopt correct
-
-# costemize promt
-PROMPT='%U%n:%m%u %/> '
 
 # for fast renaming with regular expressions
 autoload -U zmv
@@ -77,8 +70,7 @@ export PYTHONSTARTUP="$HOME/.pythonrc"
 # python site packages
 export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 
-# git usablility
-# source ~/git-completion.bash
+# git aliases
 alias gco='git ccheckout'
 alias gci='git commit'
 alias grb='git rebase'
@@ -87,29 +79,31 @@ alias gpl='git pull'
 
 
 #### LINUX/GNU ####
-
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
 
 
 #### MAC OSX ####
-
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     git config --global credential.helper osxkeychain
     # blender in Command-Line
     if [ -f /Applications/Blender/blender.app ]; then
         alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
     fi
-    # some stuff for homebrew
+    # fix PATH
     export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
     # LaTex progs
     export PATH="$PATH:/usr/texbin"
 
+
+#### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # ...
+
+
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
