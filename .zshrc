@@ -79,7 +79,7 @@ export PYTHONSTARTUP="$HOME/.pythonrc"
 export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 
 # git aliases
-alias gco='git ccheckout'
+alias gco='git checkout'
 alias gci='git commit -am'
 alias grb='git rebase'
 alias gpu='git push'
