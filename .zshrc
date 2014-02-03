@@ -30,6 +30,12 @@ zstyle ':completion:*:functions' ignored-patterns '_*'
 # cd will never select the parent directory (e.g.: cd ../<TAB>)
 zstyle ':completion:*:cd:*' ignore-parents parent pwd
 
+# some options
+setopt append_history
+setopt extended_history # time log
+setopt shared_history
+setopt hist_reduce_blanks
+
 # enable color support of ls and also add handy aliases
 if [ "$TERM" != "dumb" ]; then
     alias ls='ls -G'
