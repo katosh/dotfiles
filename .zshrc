@@ -94,6 +94,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         export LESSOPEN="| source-highlight %s"
         export LESS=' -R '
     fi
+    # often used commands
+    alias ag='sudo apl-get'
 
 
 #### MAC OSX ####
