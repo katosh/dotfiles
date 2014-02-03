@@ -114,6 +114,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
         export LESSOPEN="| source-highlight --style-file=esc-solarized.style -f esc -i %s"
         export LESS=' -R '
     fi
+    # often used commands
+    alias b='brew'
 
 
 #### CYG-WIN ###
