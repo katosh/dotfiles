@@ -140,3 +140,7 @@ if [ -f $HOME/Symmetry ]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
 fi
 
+# bitly alias
+if [ -f $HOME/Scripts/bitly.py ]; then
+    alias bitly='$HOME/Scripts/bitly.py'
+fi
