@@ -83,7 +83,8 @@ set lbr " Wrap text instead of being on one line
 set nobackup
 set noswapfile
 " set nopaste for intelligent pasting while programming
-set paste " no intellegence for pasting
+" set paste " no intellegence for pasting
+set pastetoggle=<F2>
 
 " highlight overlength line parts
 highlight OverLength ctermbg=red ctermfg=white guibg=#d70000
