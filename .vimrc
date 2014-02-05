@@ -45,11 +45,13 @@ set lbr " Wrap text instead of being on one line
 set pastetoggle=<F12>
 set autowrite " automatically write to file on buffer-change
 set backspace=indent,eol,start " allow backspacing over everything in insert mode
-
 set history=2000
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
 set incsearch		" do incremental searching
+" scroll bevor hitting the edge
+set scrolloff=4
+set sidescroll=8
 
 if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
