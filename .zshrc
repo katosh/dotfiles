@@ -79,7 +79,7 @@ export PYTHONSTARTUP="$HOME/.pythonrc"
 export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 
 # git aliases
-alias gco='git ccheckout'
+alias gco='git checkout'
 alias gci='git commit -am'
 alias grb='git rebase'
 alias gpu='git push'
@@ -94,6 +94,8 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         export LESSOPEN="| source-highlight %s"
         export LESS=' -R '
     fi
+    # often used commands
+    alias ag='sudo apl-get'
 
 
 #### MAC OSX ####
@@ -103,12 +105,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [ -f /Applications/Blender/blender.app ]; then
         alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
     fi
-    # fix PATH
-    export PATH="/usr/sbin:$PATH"
-    export PATH="/usr/local/sbin:$PATH"
-    export PATH="/usr/local/bin:$PATH"
-    # LaTex progs
-    export PATH="$PATH:/usr/texbin"
     # syntax-highlight for less if installed
     if [ source-highlight ]; then
         export LESSOPEN="| source-highlight --style-file=esc-solarized.style -f esc -i %s"
@@ -144,3 +140,7 @@ if [ -f $HOME/Symmetry ]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
 fi
 
+# bitly alias
+if [ -f $HOME/Scripts/bitly.py ]; then
+    alias bitly='$HOME/Scripts/bitly.py'
+fi
