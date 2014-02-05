@@ -38,12 +38,15 @@ setopt hist_reduce_blanks
 
 # enable color support of ls and also add handy aliases
 if [ "$TERM" != "dumb" ]; then
-    alias ls='ls -G'
-    #alias l='ls -CF'
-    alias la='ls -a'
-    alias ll='ls -lA'          # ohne . und ..
-    alias llh='ls -lh'
+    if [ man ls | grep -e '--color' ]; then
+        alias ls='ls --color=auto'
+    else
+        alias ls='ls -GF'
+    fi
 fi
+alias la='ls -a'
+alias ll='ls -lA'          # ohne . und ..
+alias llh='ls -lh'
 
 # aliases for most used calls
 alias ..='cd ..'
