@@ -2,36 +2,8 @@
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file
-endif
-set history=1000
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set incsearch		" do incremental searching
-
-" Don't use Ex mode, use Q for formatting
-map Q gq
-
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-  set hlsearch
-endif
-
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
-
   " Enable file type detection.
   " Use the default filetype settings, so that mail gets 'tw' set to 72,
   " 'cindent' is on in C files, etc.
@@ -56,21 +28,11 @@ if has("autocmd")
     \ endif
 
   augroup END
-
-else
-
-endif
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
 endif
 
 
-" small behaviors
+""" Options """
+
 set autoindent
 syntax enable
 set background=dark
@@ -80,11 +42,34 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 set lbr " Wrap text instead of being on one line
-set nobackup
-set noswapfile
-" set nopaste for intelligent pasting while programming
-" set paste " no intellegence for pasting
-set pastetoggle=<F2>
+set pastetoggle=<F12>
+set autowrite " automatically write to file on buffer-change
+set backspace=indent,eol,start " allow backspacing over everything in insert mode
+
+set history=2000
+set ruler		" show the cursor position all the time
+set showcmd		" display incomplete commands
+set incsearch		" do incremental searching
+
+if has("vms")
+  set nobackup		" do not keep a backup file, use versions instead
+else
+  set backup		" keep a backup file
+endif
+
+
+""" HIGHLIGHTING """
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
 
 " highlight overlength line parts
 highlight OverLength ctermbg=red ctermfg=white guibg=#d70000
@@ -93,6 +78,9 @@ match OverLength /\%80v.\+/
 " show trailing whitspace
 highlight ExtraWhitespace ctermbg=red guibg=red
 match ExtraWhitespace /\s\+$/
+
+
+""" BINDINGS """
 
 " tab navigation
 nnoremap <C-a> :tabprevious<CR>
