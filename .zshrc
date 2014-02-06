@@ -38,7 +38,7 @@ setopt hist_reduce_blanks
 
 # enable color support of ls and also add handy aliases
 if [ "$TERM" != "dumb" ]; then
-    if [ man ls | grep -e '--color' ]; then
+    if man ls | grep -e '--color' &>/dev/null; then
         alias ls='ls --color=auto'
     else
         alias ls='ls -GF'
@@ -146,4 +146,9 @@ fi
 # bitly alias
 if [ -f $HOME/Scripts/bitly.py ]; then
     alias bitly='$HOME/Scripts/bitly.py'
+fi
+
+# matlab alias
+if command -v matlab >/dev/null 2>&1; then
+    alias matl='matlab -nodesktop -nosplash'
 fi
