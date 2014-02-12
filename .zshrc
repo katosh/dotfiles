@@ -103,6 +103,12 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 
 #### MAC OSX ####
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+    export PATH="/usr/sbin:$PATH"
+    export PATH="/usr/local/sbin:$PATH"
+    export PATH="/usr/local/bin:$PATH"
+    # LaTex progs
+    export PATH="$PATH:/usr/texbin"
+    # git keychain
     git config --global credential.helper osxkeychain
     # blender in Command-Line
     if [ -f /Applications/Blender/blender.app ]; then
