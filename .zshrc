@@ -36,14 +36,6 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-# enable color support of ls and also add handy aliases
-if [ "$TERM" != "dumb" ]; then
-    if man ls | grep -e '--color' &>/dev/null; then
-        alias ls='ls --color=auto'
-    else
-        alias ls='ls -GF'
-    fi
-fi
 alias la='ls -a'
 alias ll='ls -lA'          # ohne . und ..
 alias llh='ls -lh'
@@ -99,6 +91,10 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     fi
     # often used commands
     alias ag='sudo apl-get'
+    # enable color support of ls
+    if [ "$TERM" != "dumb" ]; then
+            alias ls='ls --color=auto'
+    fi
 
 
 #### MAC OSX ####
@@ -121,7 +117,10 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
     # often used commands
     alias b='brew'
-
+    # enable color support of ls
+    if [ "$TERM" != "dumb" ]; then
+            alias ls='ls -GF'
+    fi
 
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
