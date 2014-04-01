@@ -71,7 +71,7 @@ autoload -U zmv
 # python config with autocompletion
 export PYTHONSTARTUP="$HOME/.pythonrc"
 # python site packages
-export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=/usr/local/lib/python3.3/site-packages
 
 # git aliases
 alias gco='git checkout'
