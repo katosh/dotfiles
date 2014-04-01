@@ -110,7 +110,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # git keychain
     git config --global credential.helper osxkeychain
     # blender in Command-Line
-    if [ -f /Applications/Blender/blender.app ]; then
+    if [ -e /Applications/Blender/blender.app ]; then
         alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
     fi
     # syntax-highlight for less if installed
