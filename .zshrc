@@ -99,6 +99,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 
 #### MAC OSX ####
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+    export PATH="/bin:$PATH"
+    export PATH="/sbin:$PATH"
+    export PATH="/usr/bin:$PATH"
     export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
@@ -125,8 +128,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # ...
-
-
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
@@ -144,7 +145,7 @@ export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
 
 # for the symmetry project
-if [ -f $HOME/Symmetry ]; then
+if [ -d $HOME/Symmetry ]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
 fi
 

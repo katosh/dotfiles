@@ -1,10 +1,8 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =8
-let g:netrw_dirhist_1='/Users/dominik/Downloads/wiki2beamer-0.9.5'
-let g:netrw_dirhist_2='/Users/dominik/Downloads/wiki2beamer-0.9.5/code'
-let g:netrw_dirhist_3='/Users/dominik/Downloads/wiki2beamer-0.9.5'
-let g:netrw_dirhist_4='/Users/dominik/Downloads/wiki2beamer-0.9.5/code'
-let g:netrw_dirhist_5='/Users/dominik/.ssh'
-let g:netrw_dirhist_6='/Users/dominik/Symmetry/__pycache__'
-let g:netrw_dirhist_7='/Users/dominik/.vim'
-let g:netrw_dirhist_8='/Users/dominik/.ssh'
+let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_1='/Users/dominik/.adobe'
+let g:netrw_dirhist_2='/Users/dominik/.Trash'
+let g:netrw_dirhist_3='/Users/dominik/.BitchX'
+let g:netrw_dirhist_4='/Users/dominik/.Trash'
+let g:netrw_dirhist_5='/Users/dominik/.adobe'
+let g:netrw_dirhist_6='/Users/dominik/.BitchX'
