@@ -90,7 +90,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         export LESS=' -R '
     fi
     # often used commands
-    alias ag='sudo apl-get'
+    alias ag='sudo apt-get'
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
             alias ls='ls --color=auto'
