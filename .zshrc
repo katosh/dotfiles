@@ -82,7 +82,7 @@ alias gpl='git pull'
 
 
 #### LINUX/GNU ####
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [[ "$OSTYPE" == "linux-gnueabi" ]]; then
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
     if [ source-highlight ]; then
