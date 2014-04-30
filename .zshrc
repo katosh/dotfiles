@@ -82,7 +82,7 @@ alias gpl='git pull'
 
 
 #### LINUX/GNU ####
-if [[ "$OSTYPE" == "linux-gnueabi" ]]; then
+if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
     if [ source-highlight ]; then
@@ -95,6 +95,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" ]]; then
     if [ "$TERM" != "dumb" ]; then
             alias ls='ls --color=auto'
     fi
+    export PATH="$PATH:/usr/sbin"
 
 
 #### MAC OSX ####
