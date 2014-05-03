@@ -91,6 +91,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
     fi
     # often used commands
     alias ag='sudo apt-get'
+    alias ap='sudo aptitude'
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
             alias ls='ls --color=auto'
