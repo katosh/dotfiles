@@ -59,6 +59,9 @@ Pii(){
 # tmux 256 color support
 alias tmux="tmux -2"
 
+# test if colors are displayed
+alias coltest='(x=`tput op` y=`printf %76s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done)'
+
 # display most used commands
 alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -n -r|less'
 
