@@ -92,10 +92,12 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
         export LESSOPEN="| source-highlight %s"
         export LESS=' -R '
     fi
+
     # often used commands
     alias ag='sudo apt-get'
     alias ap='sudo aptitude'
     alias sup='sudo pm-suspend'
+    alias sdown='sudo halt'
 
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
