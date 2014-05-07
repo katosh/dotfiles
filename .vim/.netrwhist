@@ -1,11 +1,3 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =9
-let g:netrw_dirhist_1='/Users/dominik/.adobe'
-let g:netrw_dirhist_2='/Users/dominik/.Trash'
-let g:netrw_dirhist_3='/Users/dominik/.BitchX'
-let g:netrw_dirhist_4='/Users/dominik/.Trash'
-let g:netrw_dirhist_5='/Users/dominik/.adobe'
-let g:netrw_dirhist_6='/Users/dominik/.BitchX'
-let g:netrw_dirhist_7='/usr/share/awesome/themes/zen2/layouts'
-let g:netrw_dirhist_8='/usr/share/awesome/themes/zen2/taglist'
-let g:netrw_dirhist_9='/usr/share/awesome/themes/zen2/titlebar'
+let g:netrw_dirhist_cnt =1
+let g:netrw_dirhist_1='/etc/modules-load.d'
