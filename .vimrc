@@ -77,9 +77,12 @@ endif
 highlight OverLength ctermbg=red ctermfg=white guibg=#d70000
 match OverLength /\%80v.\+/
 
-" show trailing whitspace
+" show trailing white space
 highlight ExtraWhitespace ctermbg=red guibg=red
 match ExtraWhitespace /\s\+$/
+
+" alias to delete trailing white spaces
+:command Dws %s/\s\+$//g
 
 
 """ BINDINGS """
