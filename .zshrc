@@ -42,14 +42,6 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-# enable color support of ls and also add handy aliases
-if [ "$TERM" != "dumb" ]; then
-    if man ls | grep -e '--color' &>/dev/null; then
-        alias ls='ls --color=auto'
-    else
-        alias ls='ls -GF'
-    fi
-fi
 alias la='ls -a'
 alias ll='ls -lA'          # ohne . und ..
 alias llh='ls -lh'
@@ -73,6 +65,9 @@ Pii(){
 # tmux 256 color support
 alias tmux="tmux -2"
 
+# test if colors are displayed
+alias coltest='(x=`tput op` y=`printf %76s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done)'
+
 # display most used commands
 alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -n -r|less'
 
@@ -85,7 +80,7 @@ autoload -U zmv
 # python config with autocompletion
 export PYTHONSTARTUP="$HOME/.pythonrc"
 # python site packages
-export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=/usr/local/lib/python3.3/site-packages
 
 # git aliases
 alias gco='git checkout'
@@ -96,7 +91,7 @@ alias gpl='git pull'
 
 
 #### LINUX/GNU ####
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
     if [ source-highlight ]; then
@@ -104,11 +99,20 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         export LESS=' -R '
     fi
     # often used commands
-    alias ag='sudo apl-get'
+    alias ag='sudo apt-get'
+    alias ap='sudo aptitude'
+    # enable color support of ls
+    if [ "$TERM" != "dumb" ]; then
+            alias ls='ls --color=auto'
+    fi
+    export PATH="$PATH:/usr/sbin"
 
 
 #### MAC OSX ####
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+    export PATH="/bin:$PATH"
+    export PATH="/sbin:$PATH"
+    export PATH="/usr/bin:$PATH"
     export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
@@ -117,7 +121,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # git keychain
     git config --global credential.helper osxkeychain
     # blender in Command-Line
-    if [ -f /Applications/Blender/blender.app ]; then
+    if [ -e /Applications/Blender/blender.app ]; then
         alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
     fi
     # syntax-highlight for less if installed
@@ -127,13 +131,14 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
     # often used commands
     alias b='brew'
-
+    # enable color support of ls
+    if [ "$TERM" != "dumb" ]; then
+            alias ls='ls -GF'
+    fi
 
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         # ...
-
-
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
@@ -151,7 +156,7 @@ export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
 
 # for the symmetry project
-if [ -f $HOME/Symmetry ]; then
+if [ -d $HOME/Symmetry ]; then
     export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
 fi
 
