@@ -30,6 +30,12 @@ zstyle ':completion:*:functions' ignored-patterns '_*'
 # cd will never select the parent directory (e.g.: cd ../<TAB>)
 zstyle ':completion:*:cd:*' ignore-parents parent pwd
 
+# completion format
+zstyle ':completion:*:descriptions' format $'%{\e[0;31m%}%d%{\e[0m%}'
+zstyle ':completion:*:corrections' format $'%{\e[0;31m%}%d%{\e[0m%}'
+zstyle ':completion:*:message' format $'%{\e[0;31m%}%d%{\e[0m%}'
+zstyle ':completion:*:warnings' format $'%{\e[0;31m%}%d%{\e[0m%}'
+
 # some options
 setopt append_history
 setopt extended_history # time log
