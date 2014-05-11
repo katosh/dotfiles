@@ -97,7 +97,7 @@ alias gpl='git pull'
 
 ## some automations
 # vim open filetype in taps
-vfo() {
+vto() {
     vim -p *.$1
 }
 
