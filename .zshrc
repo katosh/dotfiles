@@ -58,6 +58,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep'
 alias v='vim'
+alias sv='sudo vim'
 
 # ssh aliases
 alias Mi='ssh -X mi'
