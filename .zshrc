@@ -95,6 +95,12 @@ alias grb='git rebase'
 alias gpu='git push'
 alias gpl='git pull'
 
+## some automations
+# vim open filetype in taps
+vfo() {
+    vim -p *.$1
+}
+
 
 #### LINUX/GNU ####
 if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
