@@ -12,6 +12,9 @@ compinit
 
 # costemize promt
 PROMPT='%U%n:%m%u %/> '
+if [[ "$USER" == "root"]]; then
+    PROMPT='%U%n:%m%u %/# '
+fi
 
 # Cache completion for better preformance
 zstyle ':completion:*' use-cache on
