@@ -11,11 +11,8 @@ autoload -Uz compinit
 compinit
 
 # costemize promt
-if [[ "$USER" == "root" ]]; then
-    PROMPT='%U%n:%m%u %/# '
-else
-    PROMPT='%U%n:%m%u %/> '
-fi
+#                  normel user        ||       root
+(( EUID )) && PROMPT='%U%n:%m%u %/> ' || PROMPT='%U%n:%m%u %/# '
 
 # Cache completion for better preformance
 zstyle ':completion:*' use-cache on
