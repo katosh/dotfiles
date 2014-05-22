@@ -121,7 +121,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
 
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
-            alias ls='ls --color=auto'
+            alias ls='ls --color=always'
     fi
 
 
@@ -138,16 +138,19 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     if [ -e /Applications/Blender/blender.app ]; then
         alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
     fi
-    # syntax-highlight for less if installed
+    # colors for less
+    #export LESSOPEN='| ~/.lessfilter'
     if [ source-highlight ]; then
-        export LESSOPEN="| source-highlight --style-file=esc-solarized.style -f esc -i %s"
-        export LESS=' -R '
+        export LESSOPEN="$LESSOPEN | source-highlight --style-file=esc-solarized.style -f esc -i"
     fi
+    export LESSOPEN="$LESSOPEN %s"
+    export LESS=' -R '
     # often used commands
     alias b='brew'
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
             alias ls='ls -GF'
+            export CLICOLOR_FORCE="yes" # force colors
     fi
 
 #### CYG-WIN ###
