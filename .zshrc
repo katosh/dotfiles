@@ -129,6 +129,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/bin:$PATH"
     export PATH="/usr/bin:$PATH"
+    export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
     # LaTex progs
     export PATH="$PATH:/usr/texbin"
