@@ -118,6 +118,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
     alias ap='sudo aptitude'
     alias sup='sudo pm-suspend'
     alias sdown='sudo halt'
+    alias mps='mplayer -af scaletempo' # fix pitch for all speeds
 
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
