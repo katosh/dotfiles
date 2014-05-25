@@ -1,8 +1,9 @@
 xterm*termName: xterm-256color
 
 ! Font
-xterm*faceName: Meslo LG S:antialias=true
-xterm*faceSize: 9
+!xterm*faceName: Meslo LG S:antialias=true
+xterm*faceName: DejaVu Sans Mono Book
+xterm*faceSize: 11
 
 ! ----------- Solarized --------------
 
