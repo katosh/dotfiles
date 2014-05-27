@@ -5,6 +5,9 @@ xterm*termName: xterm-256color
 xterm*faceName: DejaVu Sans Mono Book
 xterm*faceSize: 10
 
+! disable flashing stuff
+xterm*visualBell: false
+
 ! ----------- Solarized --------------
 
 ! Common
