@@ -10,6 +10,9 @@ zstyle :compinstall filename '/Users/dominik/.zshrc'
 autoload -Uz compinit
 compinit
 
+# enable keep
+autoload -U keeper && keeper
+
 # costemize promt
 #                  normel user        ||       root
 (( EUID )) && PROMPT='%U%n:%m%u %/> ' || PROMPT='%U%n:%m%u %/# '
