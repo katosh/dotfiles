@@ -137,7 +137,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/usr/bin:$PATH"
     export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
-    export PATH='/usr/local/sbin:$PATH'
+    export PATH="/usr/local/sbin:$PATH"
     # LaTex progs
     export PATH="$PATH:/usr/texbin"
     # git keychain
