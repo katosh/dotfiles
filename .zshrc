@@ -82,6 +82,9 @@ alias coltest='(x=`tput op` y=`printf %76s`;for i in {0..256};do o=00$i;echo -e 
 # display most used commands
 alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -n -r|less'
 
+# fix pitch for all speeds
+alias mps='mplayer -af scaletempo'
+
 # autocorrection for commands on return
 setopt correct
 
@@ -121,7 +124,6 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
     alias ap='sudo aptitude'
     alias sup='sudo pm-suspend'
     alias sdown='sudo halt'
-    alias mps='mplayer -af scaletempo' # fix pitch for all speeds
 
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
