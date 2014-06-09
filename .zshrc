@@ -136,6 +136,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
 #### MAC OSX ####
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/bin:$PATH"
+    export PATH="/sbin:$PATH"
     export PATH="/usr/bin:$PATH"
     export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
