@@ -164,6 +164,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
             alias ls='ls -GF'
             export CLICOLOR_FORCE="yes" # force colors
     fi
+    # programms
+    alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
 
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
