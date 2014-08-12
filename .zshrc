@@ -169,7 +169,11 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
-        # ...
+    # enable color support of ls
+    if [ "$TERM" != "dumb" ]; then
+            alias ls='ls --color=always'
+            eval $(dircolors ~/.dircolors)
+    fi
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
