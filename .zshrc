@@ -177,7 +177,7 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
     # often used commands
     alias ac='apt-cyg'
     # in the MDC
-    alias silac='cd /cygdrive/z/Dominik/model files Matlab'
+    alias silac='cd /cygdrive/z/Dominik/model\ files\ Matlab'
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
