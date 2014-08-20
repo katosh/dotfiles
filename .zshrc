@@ -174,6 +174,10 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
             alias ls='ls --color=always'
             eval $(dircolors ~/.dircolors)
     fi
+    # often used commands
+    alias ac='apt-cyg'
+    # in the MDC
+    alias silac='cd /cygdrive/z/Dominik/model files Matlab'
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
