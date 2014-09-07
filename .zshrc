@@ -102,6 +102,7 @@ alias gci='git commit -am'
 alias grb='git rebase'
 alias gpu='git push'
 alias gpl='git pull'
+alias gme='git merge --no-commit'
 
 ## some automations
 # vim open filetype in taps
