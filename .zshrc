@@ -52,6 +52,9 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
+# set some variables
+export EDITOR='vim'
+
 alias la='ls -a'
 alias ll='ls -lA'          # ohne . und ..
 alias llh='ls -lh'
@@ -177,7 +180,7 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
     # often used commands
     alias ac='apt-cyg'
     # in the MDC
-    alias silac='cd /cygdrive/z/Dominik/model\ files\ Matlab'
+    alias -g silacd='/cygdrive/c/Users/dotto/Documents/Dominik/matlab'
 elif [[ "$OSTYPE" == "win32" ]]; then
         # ...
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
