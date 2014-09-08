@@ -54,6 +54,7 @@ setopt hist_reduce_blanks
 
 # set some variables
 export EDITOR='vim'
+export CYGWIN='nodosfilewarning'
 
 alias la='ls -a'
 alias ll='ls -lA'          # ohne . und ..
@@ -105,6 +106,7 @@ alias gci='git commit -am'
 alias grb='git rebase'
 alias gpu='git push'
 alias gpl='git pull'
+alias gme='git merge --no-commit'
 
 ## some automations
 # vim open filetype in taps
