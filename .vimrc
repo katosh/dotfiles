@@ -84,6 +84,9 @@ match ExtraWhitespace /\s\+$/
 " alias to delete trailing white spaces
 :command Dws %s/\s\+$//g
 
+" saving of files as sudo
+cmap w!! w !sudo tee > /dev/null %
+
 
 """ BINDINGS """
 
