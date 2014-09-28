@@ -66,8 +66,9 @@ alias sv='sudo vim'
 
 # ssh aliases
 alias Mi='ssh -X mi'
-alias Pi='ssh -X pi'
 alias Zedat='ssh -X zedat'
+alias Pi='ssh -X pi'
+alias Piw='ssh -X piw'
 Pii(){
     rip=`lynx --dump http://userpage.fu-berlin.de/katosh/piip.txt | xargs -n 1 | tail -1`
     ssh pi@$rip
