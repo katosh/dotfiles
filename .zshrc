@@ -69,10 +69,7 @@ alias Mi='ssh -X mi'
 alias Zedat='ssh -X zedat'
 alias Pi='ssh -X pi'
 alias Piw='ssh -X piw'
-Pii(){
-    rip=`lynx --dump http://userpage.fu-berlin.de/katosh/piip.txt | xargs -n 1 | tail -1`
-    ssh pi@$rip
-}
+alias Pii='ssh -X pii'
 
 # tmux 256 color support
 alias tmux="tmux -2"
