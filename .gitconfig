@@ -15,3 +15,5 @@
     pu = push origin
     pl = pull
 	last = log -1 HEAD
+[credential]
+	helper = osxkeychain

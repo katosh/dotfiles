@@ -108,6 +108,11 @@ vto() {
     vim -p *.$1
 }
 
+## keybindings
+
+bindkey "\e[A"  history-beginning-search-backward
+bindkey "\e[B"  history-beginning-search-forward
+
 
 #### LINUX/GNU ####
 if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
