@@ -116,6 +116,7 @@ bindkey "\e[B"  history-beginning-search-forward
 
 #### LINUX/GNU ####
 if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
+    export EDITOR="/usr/bin/vim"
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
     if [ source-highlight ]; then
@@ -146,6 +147,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/usr/sbin:$PATH"
     export PATH="/usr/local/bin:$PATH"
     export PATH="/usr/local/sbin:$PATH"
+    export EDITOR="/usr/local/bin/vim"
     # LaTex progs
     export PATH="$PATH:/usr/texbin"
     # git keychain
@@ -212,3 +214,6 @@ fi
 if command -v matlab >/dev/null 2>&1; then
     alias matl='matlab -nodesktop -nosplash'
 fi
+
+# add local configurations
+if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
