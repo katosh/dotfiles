@@ -172,6 +172,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
     # programms
     alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
+    # adding /usr/texbin to PATH for MacTeX
+    eval `/usr/libexec/path_helper -s`
 
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
