@@ -13,6 +13,10 @@ compinit
 # enable keep
 autoload -U keeper && keeper
 
+# make directory stack to skip back to previous directory
+setopt AUTO_PUSHD
+setopt pushdminus # invert +/- arguments
+
 # costemize promt
 #                  normel user        ||       root
 (( EUID )) && PROMPT='%U%n:%m%u %/> ' || PROMPT='%U%n:%m%u %/# '
