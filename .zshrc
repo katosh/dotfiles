@@ -114,8 +114,10 @@ vto() {
 
 ## keybindings
 
-bindkey "\e[A"  history-beginning-search-backward
-bindkey "\e[B"  history-beginning-search-forward
+bindkey "^[[A"  history-beginning-search-backward
+bindkey "OA"  history-beginning-search-backward
+bindkey "^[[B"  history-beginning-search-forward
+bindkey "OB"  history-beginning-search-forward
 
 
 #### LINUX/GNU ####
