@@ -115,9 +115,7 @@ vto() {
 ## keybindings
 
 bindkey "^[[A"  history-beginning-search-backward
-bindkey "OA"  history-beginning-search-backward
 bindkey "^[[B"  history-beginning-search-forward
-bindkey "OB"  history-beginning-search-forward
 
 
 #### LINUX/GNU ####
@@ -139,6 +137,11 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "
     fi
     #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
     export LS_COLORS
+
+    if [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
+        bindkey "OA"  history-beginning-search-backward
+        bindkey "OB"  history-beginning-search-forward
+    fi
 
 
 #### MAC OSX ####
