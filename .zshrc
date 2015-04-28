@@ -134,7 +134,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "
     alias ag='sudo apt-get'
     alias ap='sudo aptitude'
     alias sup='sudo pm-suspend'
-    alias sdown='sudo halt'
+    alias sre='sudo shutdown -r 0'
 
     # enable color support of ls
     if [ "$TERM" != "dumb" ]; then
