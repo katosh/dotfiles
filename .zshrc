@@ -121,7 +121,7 @@ bindkey "OB"  history-beginning-search-forward
 
 
 #### LINUX/GNU ####
-if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "linux-gnueabihf"]]; then
+if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "linux-gnueabihf" ]]; then
     export EDITOR="/usr/bin/vim"
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
