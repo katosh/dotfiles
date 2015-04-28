@@ -125,10 +125,6 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "
     export EDITOR="/usr/bin/vim"
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=3600'
-    if [ source-highlight ]; then
-        export LESSOPEN="| source-highlight %s"
-        export LESS=' -R '
-    fi
 
     # often used commands
     alias ag='sudo apt-get'
@@ -154,8 +150,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH="/usr/local/bin:$PATH"
     export PATH="/usr/local/sbin:$PATH"
     export EDITOR="/usr/local/bin/vim"
-    # LaTex progs
-    export PATH="$PATH:/usr/texbin"
+    # adding /usr/texbin to PATH for MacTeX
+    eval `/usr/libexec/path_helper -s`
     # git keychain
     git config --global credential.helper osxkeychain
     # blender in Command-Line
@@ -178,8 +174,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     fi
     # programms
     alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
-    # adding /usr/texbin to PATH for MacTeX
-    eval `/usr/libexec/path_helper -s`
 
 #### CYG-WIN ###
 elif [[ "$OSTYPE" == "cygwin" ]]; then
