@@ -138,7 +138,7 @@ if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "
     #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
     export LS_COLORS
 
-    if [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
+    if [[ "$OSTYPE" == "linux-gnueabihf" || "$OSTYPE" == "linux-gnu" ]]; then
         bindkey "OA"  history-beginning-search-backward
         bindkey "OB"  history-beginning-search-forward
     fi
