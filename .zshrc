@@ -205,11 +205,6 @@ export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
 
-# for the symmetry project
-if [ -d $HOME/Symmetry ]; then
-    export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
-fi
-
 # bitly alias
 if [ -f $HOME/Scripts/bitly.py ]; then
     alias bitly='$HOME/Scripts/bitly.py'
