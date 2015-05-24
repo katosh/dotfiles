@@ -16,4 +16,7 @@
     pl = pull
 	last = log -1 HEAD
 [credential]
-	helper = osxkeychain
+    helper = osxkeychain
+
+[diff "pdf"]
+        textconv = pdf2txt
