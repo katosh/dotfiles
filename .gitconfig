@@ -16,4 +16,4 @@
     pl = pull
 	last = log -1 HEAD
 [credential]
-	helper = osxkeychain
+	helper = cache --timeout=3600
