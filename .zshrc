@@ -87,6 +87,9 @@ alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {pri
 # fix pitch for all speeds
 alias mps='mplayer -af scaletempo'
 
+# geting my ip
+alias myip='curl ifconfig.me/ip'
+
 # autocorrection for commands on return
 setopt correct
 
