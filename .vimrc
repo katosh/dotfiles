@@ -100,3 +100,6 @@ inoremap <C-t> <Esc>:tabnew<CR>
 
 " Indent Python in the Google way.
 source ~/.vim_python_style
+
+" More Tabs
+set tabpagemax=30
