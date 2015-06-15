@@ -55,6 +55,8 @@ set sidescroll=8
 
 if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
+  set nowritebackup " no backup while writing
+  set noswapfile    " no swap files
 else
   set backup		" keep a backup file
 endif
