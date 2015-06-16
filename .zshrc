@@ -68,13 +68,6 @@ alias -g g='| grep'
 alias v='vim'
 alias sv='sudo vim'
 
-# ssh aliases
-alias Mi='ssh -X mi'
-alias Zedat='ssh -X zedat'
-alias Pi='ssh -X pi'
-alias Piw='ssh -X piw'
-alias Pii='ssh -X pii'
-
 # tmux 256 color support
 alias tmux="tmux -2"
 
