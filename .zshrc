@@ -92,7 +92,7 @@ autoload -U zmv
 # python config with autocompletion
 export PYTHONSTARTUP="$HOME/.pythonrc"
 # python site packages
-export PYTHONPATH=/usr/local/lib/python3.3/site-packages
+export PYTHONPATH=/usr/local/Cellar/opencv/2.4.11_1/lib/python2.7/site-packages
 
 # git aliases
 alias gco='git checkout'

@@ -23,7 +23,8 @@ mkdir -p $olddir
 # move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks
 echo "Moving any existing dotfiles from $HOME to $olddir"
 for file in $files; do
-    mv $HOME/$file $olddir
+    [ -f $HOME/$file ] && mv $HOME/$file $olddir
     echo "Creating symlink to $file in home directory."
     ln -s $dir/$file $HOME/
 done
+touch $HOME/.hushlogin
