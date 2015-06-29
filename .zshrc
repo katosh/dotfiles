@@ -71,9 +71,6 @@ alias sv='sudo vim'
 # tmux 256 color support
 alias tmux="tmux -2"
 
-# test if colors are displayed
-alias coltest='(x=`tput op` y=`printf %76s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done)'
-
 # display most used commands
 alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -n -r|less'
 
@@ -114,102 +111,43 @@ bindkey "^[[A"  history-beginning-search-backward
 bindkey "^[[B"  history-beginning-search-forward
 
 
-#### LINUX/GNU ####
-if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" || "$OSTYPE" == "linux-gnueabihf" ]]; then
-    export EDITOR="/usr/bin/vim"
-    git config --global credential.helper cache
-    git config --global credential.helper 'cache --timeout=3600'
-
-    # often used commands
-    alias ag='sudo apt-get'
-    alias ap='sudo aptitude'
-    alias sup='sudo pm-suspend'
-    alias sre='sudo shutdown -r 0'
-
-    # enable color support of ls
-    if [ "$TERM" != "dumb" ]; then
-            alias ls='ls --color=always'
-            eval $(dircolors ~/.dircolors)
-    fi
-    #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
-    export LS_COLORS
-
-    if [[ "$OSTYPE" == "linux-gnueabihf" || "$OSTYPE" == "linux-gnu" ]]; then
-        bindkey "OA"  history-beginning-search-backward
-        bindkey "OB"  history-beginning-search-forward
-    fi
-
-
-#### MAC OSX ####
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    export PATH="/bin:$PATH"
-    export PATH="/sbin:$PATH"
-    export PATH="/usr/bin:$PATH"
-    export PATH="/usr/sbin:$PATH"
-    export PATH="/usr/local/bin:$PATH"
-    export PATH="/usr/local/sbin:$PATH"
-    export EDITOR="/usr/local/bin/vim"
-    # adding /usr/texbin to PATH for MacTeX
-    eval `/usr/libexec/path_helper -s`
-    # git keychain
-    git config --global credential.helper osxkeychain
-    # blender in Command-Line
-    if [ -e /Applications/Blender/blender.app ]; then
-        alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
-    fi
-    # colors for less
-    #export LESSOPEN='| ~/.lessfilter'
-    if [ source-highlight ]; then
-        export LESSOPEN="$LESSOPEN | source-highlight --style-file=esc-solarized.style -f esc -i"
-    fi
-    export LESSOPEN="$LESSOPEN %s"
-    export LESS=' -R '
-    # often used commands
-    alias b='brew'
-    # enable color support of ls
-    if [ "$TERM" != "dumb" ]; then
-            alias ls='ls -GF'
-            export CLICOLOR_FORCE="yes" # force colors
-    fi
-    # programms
-    alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
-
-#### CYG-WIN ###
-elif [[ "$OSTYPE" == "cygwin" ]]; then
-    # enable color support of ls
-    if [ "$TERM" != "dumb" ]; then
-            alias ls='ls --color=always'
-            eval $(dircolors ~/.dircolors)
-    fi
-    # often used commands
-    alias ac='apt-cyg'
-    # in the MDC
-    alias silac='cd /cygdrive/z/Dominik/model\ files\ Matlab'
-elif [[ "$OSTYPE" == "win32" ]]; then
-        # ...
-elif [[ "$OSTYPE" == "freebsd"* ]]; then
-        # ...
-else
-        # Unknown.
+export PATH="/bin:$PATH"
+export PATH="/sbin:$PATH"
+export PATH="/usr/bin:$PATH"
+export PATH="/usr/sbin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
+export EDITOR="/usr/local/bin/vim"
+# adding /usr/texbin to PATH for MacTeX
+eval `/usr/libexec/path_helper -s`
+# git keychain
+git config --global credential.helper osxkeychain
+# blender in Command-Line
+if [ -e /Applications/Blender/blender.app ]; then
+    alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
+fi
+# colors for less
+#export LESSOPEN='| ~/.lessfilter'
+if [ source-highlight ]; then
+    export LESSOPEN="$LESSOPEN | source-highlight --style-file=esc-solarized.style -f esc -i"
+fi
+export LESSOPEN="$LESSOPEN %s"
+export LESS=' -R '
+# often used commands
+alias b='brew'
+# enable color support of ls
+if [ "$TERM" != "dumb" ]; then
+        alias ls='ls -GF'
+        export CLICOLOR_FORCE="yes" # force colors
 fi
 
-# Tockens
-if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
+# programms
+alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
 
 # mutt emaul client
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
-
-# bitly alias
-if [ -f $HOME/Scripts/bitly.py ]; then
-    alias bitly='$HOME/Scripts/bitly.py'
-fi
-
-# matlab alias
-if command -v matlab >/dev/null 2>&1; then
-    alias matl='matlab -nodesktop -nosplash'
-fi
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
