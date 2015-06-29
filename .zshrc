@@ -131,19 +131,18 @@ export LESSOPEN="$LESSOPEN %s"
 export LESS=' -R '
 # often used commands
 alias b='brew'
-# enable color support of ls
+# enable color support of ls and gls
 if [ "$TERM" != "dumb" ]; then
         alias ls='ls -GF'
         export CLICOLOR_FORCE="yes" # force colors
+        if [ command -v gls >/dev/null 2>&1 ]; then
+            alias gls='gls --color=always'
+            eval $(gdircolors $HOME/.dircolors)
+        fi
 fi
 alias la='ls -a'
 alias ll='ls -lA'          # ohne . und ..
 alias llh='ls -lh'
-# enable color support of gls
-if [ "$TERM" != "dumb" ]; then
-        alias gls='gls --color=always'
-        eval $(gdircolors $HOME/.dircolors)
-fi
 alias gla='gls -a'
 alias gll='gls -lA'          # ohne . und ..
 alias gllh='gls -lh'
