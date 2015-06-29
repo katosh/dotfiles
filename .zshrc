@@ -56,10 +56,6 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
-
 # aliases for most used calls
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -140,6 +136,17 @@ if [ "$TERM" != "dumb" ]; then
         alias ls='ls -GF'
         export CLICOLOR_FORCE="yes" # force colors
 fi
+alias la='ls -a'
+alias ll='ls -lA'          # ohne . und ..
+alias llh='ls -lh'
+# enable color support of gls
+if [ "$TERM" != "dumb" ]; then
+        alias gls='gls --color=always'
+        eval $(gdircolors $HOME/.dircolors)
+fi
+alias gla='gls -a'
+alias gll='gls -lA'          # ohne . und ..
+alias gllh='gls -lh'
 
 # programms
 alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
