@@ -154,3 +154,8 @@ fi
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
+
+# summ disc usage of all files/directorys that fit the name pattern
+sfn(){
+    find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
+}
