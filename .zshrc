@@ -56,10 +56,6 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
-
 # aliases for most used calls
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -134,6 +130,9 @@ if [ "$TERM" != "dumb" ]; then
 fi
 #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LS_COLORS
+alias la='ls -a'
+alias ll='ls -lA'          # ohne . und ..
+alias llh='ls -lh'
 
 # Tockens
 if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
