@@ -88,7 +88,7 @@ alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {pri
 alias mps='mplayer -af scaletempo'
 
 # geting my ip
-alias myip='curl ifconfig.me/ip'
+alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # autocorrection for commands on return
 setopt correct
