@@ -53,11 +53,9 @@ set incsearch		" do incremental searching
 set scrolloff=4
 set sidescroll=8
 
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file
-endif
+set nobackup		" do not keep a backup file, use versions instead
+set nowritebackup " no backup while writing
+set noswapfile    " no swap files
 
 
 """ HIGHLIGHTING """
@@ -100,3 +98,6 @@ inoremap <C-t> <Esc>:tabnew<CR>
 
 " Indent Python in the Google way.
 source ~/.vim_python_style
+
+" More Tabs
+set tabpagemax=30
