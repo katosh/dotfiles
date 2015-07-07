@@ -95,6 +95,9 @@ alias gpu='git push'
 alias gpl='git pull'
 alias gme='git merge --no-commit'
 
+# favorit rsync
+alias c='rsync -ah --progress'
+
 ## some automations
 # vim open filetype in taps
 vto() {
