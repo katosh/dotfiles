@@ -124,7 +124,8 @@ export EDITOR="/usr/bin/vim"
 
 # often used commands
 alias ag='sudo apt-get'
-alias sre='sudo shutdown -r 0'
+alias ac='apt-cache'
+alias ap='sudo aptitude'
 
 # enable color support of ls
 if [ "$TERM" != "dumb" ]; then
