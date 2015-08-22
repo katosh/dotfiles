@@ -60,7 +60,7 @@ setopt hist_reduce_blanks
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias -g g='| grep'
+alias -g g='| grep -i'
 alias v='vim'
 alias sv='sudo vim'
 
