@@ -165,3 +165,5 @@ if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
 sfn(){
     find . -name "$*" -print0 | gdu --files0-from=- -hc | tail -n1
 }
+
+alias rr='/usr/local/bin/r'
