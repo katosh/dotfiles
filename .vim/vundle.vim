@@ -24,6 +24,7 @@ call vundle#rc()
 "Bundle 'file:///Users/gmarik/path/to/plugin'
 " ...
 Bundle 'nelstrom/vim-markdown-folding'
+Bundle 'Vim-R-plugin'
 
 filetype plugin indent on     " required!
 "
