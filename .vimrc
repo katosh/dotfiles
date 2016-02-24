@@ -15,6 +15,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 " my plugins
 Plugin 'Vim-R-plugin'
+" Plugin 'vim-pandoc/vim-rmarkdown'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
