@@ -1,5 +1,3 @@
 #!/bin/bash
 
-top -bn1 | grep "Cpu(s)" | \
-    sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | \
-    awk '{print 100 - $1"%"}'
+top -bn 2 -d 0.01 | grep '^%Cpu' | tail -n 1 | gawk '{print $2+$4+$6"%"}'
