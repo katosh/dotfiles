@@ -168,3 +168,13 @@ sfn(){
 dcsv(){
     cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
 }
+dccsv(){
+    cat $* | column -s"," -t | less -N -S
+}
+dtab(){
+    cat $* | column -t | less -N -S
+}
+stdl(){
+    ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
+}
+alias initRM="/bin/ls > README"
