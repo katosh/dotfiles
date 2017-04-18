@@ -168,3 +168,22 @@ sfn(){
 dcsv(){
     cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
 }
+dccsv(){
+    cat $* | column -s"," -t | less -N -S
+}
+dtab(){
+    cat $* | column -t | less -N -S
+}
+stdl(){
+    ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
+}
+alias initRM="/bin/ls > README"
+
+# use oh-my-zsh if exists
+# to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
+    export ZSH=$HOME/.oh-my-zsh
+    ZSH_THEME="robbyrussell"
+    plugins=(git globalias tmux)
+    source $ZSH/oh-my-zsh.sh
+fi
