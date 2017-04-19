@@ -13,6 +13,10 @@ compinit
 # enable keep
 autoload -U keeper && keeper
 
+# make directory stack to skip back to previous directory
+setopt AUTO_PUSHD
+setopt pushdminus # invert +/- arguments
+
 # costemize promt
 #                  normel user        ||       root
 (( EUID )) && PROMPT='%U%n:%m%u %/> ' || PROMPT='%U%n:%m%u %/# '
@@ -53,29 +57,22 @@ setopt share_history
 setopt hist_reduce_blanks
 
 # set some variables
-export EDITOR='vim'
 export CYGWIN='nodosfilewarning'
-
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
 
 # aliases for most used calls
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias -g g='| grep'
+alias -g g='| grep -i'
 alias v='vim'
 alias sv='sudo vim'
 
 # ssh aliases
 alias Mi='ssh -X mi'
-alias Pi='ssh -X pi'
 alias Zedat='ssh -X zedat'
-Pii(){
-    rip=`lynx --dump http://userpage.fu-berlin.de/katosh/piip.txt | xargs -n 1 | tail -1`
-    ssh pi@$rip
-}
+alias Pi='ssh -X pi'
+alias Piw='ssh -X piw'
+alias Pii='ssh -X pii'
 
 # tmux 256 color support
 alias tmux="tmux -2"
@@ -88,6 +85,9 @@ alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {pri
 
 # fix pitch for all speeds
 alias mps='mplayer -af scaletempo'
+
+# geting my ip
+alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # autocorrection for commands on return
 setopt correct
@@ -108,88 +108,35 @@ alias gpu='git push'
 alias gpl='git pull'
 alias gme='git merge --no-commit'
 
+# favorit rsync
+alias c='rsync -ah --progress'
+
 ## some automations
 # vim open filetype in taps
 vto() {
     vim -p *.$1
 }
 
+## keybindings
 
-#### LINUX/GNU ####
-if [[ "$OSTYPE" == "linux-gnueabi" || "$OSTYPE" == "linux-gnu" ]]; then
-    git config --global credential.helper cache
-    git config --global credential.helper 'cache --timeout=3600'
-    if [ source-highlight ]; then
-        export LESSOPEN="| source-highlight %s"
-        export LESS=' -R '
-    fi
+bindkey "OA"  history-beginning-search-backward
+bindkey "OB"  history-beginning-search-forward
 
-    # often used commands
-    alias ag='sudo apt-get'
-    alias ap='sudo aptitude'
-    alias sup='sudo pm-suspend'
-    alias sdown='sudo halt'
-
-    # enable color support of ls
-    if [ "$TERM" != "dumb" ]; then
-            alias ls='ls --color=always'
-            eval $(dircolors ~/.dircolors)
-    fi
-    #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
-    export LS_COLORS
-
-
-#### MAC OSX ####
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    export PATH="/bin:$PATH"
-    export PATH="/sbin:$PATH"
-    export PATH="/usr/bin:$PATH"
-    export PATH="/usr/sbin:$PATH"
-    export PATH="/usr/local/bin:$PATH"
-    export PATH="/usr/local/sbin:$PATH"
-    # LaTex progs
-    export PATH="$PATH:/usr/texbin"
-    # git keychain
-    git config --global credential.helper osxkeychain
-    # blender in Command-Line
-    if [ -e /Applications/Blender/blender.app ]; then
-        alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
-    fi
-    # colors for less
-    #export LESSOPEN='| ~/.lessfilter'
-    if [ source-highlight ]; then
-        export LESSOPEN="$LESSOPEN | source-highlight --style-file=esc-solarized.style -f esc -i"
-    fi
-    export LESSOPEN="$LESSOPEN %s"
-    export LESS=' -R '
-    # often used commands
-    alias b='brew'
-    # enable color support of ls
-    if [ "$TERM" != "dumb" ]; then
-            alias ls='ls -GF'
-            export CLICOLOR_FORCE="yes" # force colors
-    fi
-    # programms
-    alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
-
-#### CYG-WIN ###
-elif [[ "$OSTYPE" == "cygwin" ]]; then
-    # enable color support of ls
-    if [ "$TERM" != "dumb" ]; then
-            alias ls='ls --color=always'
-            eval $(dircolors ~/.dircolors)
-    fi
-    # often used commands
-    alias ac='apt-cyg'
-    # in the MDC
-    alias -g silacd='/cygdrive/c/Users/dotto/Documents/Dominik/matlab'
-elif [[ "$OSTYPE" == "win32" ]]; then
-        # ...
-elif [[ "$OSTYPE" == "freebsd"* ]]; then
-        # ...
-else
-        # Unknown.
+# enable color support of ls
+if [ "$TERM" != "dumb" ]; then
+        alias ls='ls --color=always'
+        eval $(dircolors ~/.dircolors)
 fi
+# often used commands
+alias ac='apt-cyg'
+# in the MDC
+alias -g silacd='/cygdrive/c/Users/dotto/Documents/Dominik/matlab'
+
+#LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
+export LS_COLORS
+alias la='ls -a'
+alias ll='ls -lA'          # ohne . und ..
+alias llh='ls -lh'
 
 # Tockens
 if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
@@ -198,11 +145,6 @@ if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
-
-# for the symmetry project
-if [ -d $HOME/Symmetry ]; then
-    export PYTHONPATH="$PYTHONPATH:$HOME/Symmetry/"
-fi
 
 # bitly alias
 if [ -f $HOME/Scripts/bitly.py ]; then
@@ -213,4 +155,11 @@ fi
 if command -v matlab >/dev/null 2>&1; then
     alias matl='matlab -nodesktop -nosplash'
 fi
-source $HOME/.localrc
+
+# add local configurations
+if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
+
+# summ disc usage of all files/directorys that fit the name pattern
+sfn(){
+    find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
+}

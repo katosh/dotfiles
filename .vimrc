@@ -1,6 +1,38 @@
 " Use Vim settings, rather than Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
 set nocompatible
+
+
+" Vundle
+filetype off                  " required
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" my plugins
+Plugin 'Vim-R-plugin'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
+" End Vundle
+
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -53,11 +85,9 @@ set incsearch		" do incremental searching
 set scrolloff=4
 set sidescroll=8
 
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file
-endif
+set nobackup		" do not keep a backup file, use versions instead
+set nowritebackup " no backup while writing
+set noswapfile    " no swap files
 
 
 """ HIGHLIGHTING """
@@ -84,6 +114,9 @@ match ExtraWhitespace /\s\+$/
 " alias to delete trailing white spaces
 :command Dws %s/\s\+$//g
 
+" saving of files as sudo
+cmap w!! w !sudo tee > /dev/null %
+
 
 """ BINDINGS """
 
@@ -97,3 +130,6 @@ inoremap <C-t> <Esc>:tabnew<CR>
 
 " Indent Python in the Google way.
 source ~/.vim_python_style
+
+" More Tabs
+set tabpagemax=30

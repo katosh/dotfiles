@@ -7,7 +7,7 @@
 
 ########## Variables
 # list of files/folders to symlink in homedir
-files=('.vimrc' '.tmux.conf' '.vim' '.zshrc' '.pythonrc' '.vim_python_style' '.dircolors')
+files=('.vimrc' '.tmux.conf' '.vim' '.zshrc' '.pythonrc' '.vim_python_style' '.dircolors' '.gitconfig')
 
 # dotfiles directory
 dir=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
