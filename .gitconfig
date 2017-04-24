@@ -1,6 +1,6 @@
 [user]
 	name = Dominik
-	email = dominik.otto@gmail.com
+	email = dominik.otto@izi.fraunhofer.de
 [core]
 	editor = vim
 [push]
@@ -16,7 +16,8 @@
     pl = pull
 	last = log -1 HEAD
 [credential]
-	helper = osxkeychain
-
-[diff "pdf"]
-        textconv = pdf2txt
+	helper = cache --timeout=3600
+[pack]
+    windowMemory = 1000m
+    packSizeLimit = 1000m
+    threads = 2

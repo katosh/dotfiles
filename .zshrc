@@ -56,15 +56,11 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
-
 # aliases for most used calls
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias -g g='| grep'
+alias -g g='| grep -i'
 alias v='vim'
 alias sv='sudo vim'
 
@@ -102,6 +98,9 @@ alias gpu='git push'
 alias gpl='git pull'
 alias gme='git merge --no-commit'
 
+# favorit rsync
+alias c='rsync -ah --progress'
+
 ## some automations
 # vim open filetype in taps
 vto() {
@@ -120,3 +119,40 @@ fi
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
+
+# sum disc usage of all files/directorys that fit the name pattern
+sfn(){
+    find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
+}
+
+# display csv
+dcsv(){
+    cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
+}
+dccsv(){
+    cat $* | column -s"," -t | less -N -S
+}
+dtab(){
+    cat $* | column -t | less -N -S
+}
+stdl(){
+    ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
+}
+alias initRM="/bin/ls > README"
+
+# use oh-my-zsh if exists
+# to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
+    export ZSH=$HOME/.oh-my-zsh
+    ZSH_THEME="robbyrussell"
+    plugins=(git tmux)
+    source $ZSH/oh-my-zsh.sh
+fi
+
+# my expand aliases
+globalias() {
+   zle _expand_alias
+   zle expand-word
+}
+zle -N globalias
+bindkey "^ " globalias
