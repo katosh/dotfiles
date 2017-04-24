@@ -184,6 +184,14 @@ alias initRM="/bin/ls > README"
 if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
     export ZSH=$HOME/.oh-my-zsh
     ZSH_THEME="robbyrussell"
-    plugins=(git globalias tmux)
+    plugins=(git tmux)
     source $ZSH/oh-my-zsh.sh
 fi
+
+# my expand aliases
+globalias() {
+   zle _expand_alias
+   zle expand-word
+}
+zle -N globalias
+bindkey "^ " globalias
