@@ -186,3 +186,9 @@ new_window none
 
 # screenshot of active window
 bindsym Ctrl+Print exec scrot -u '%Y%m%d_%H%M%S.png' -e 'mv $f ~/screenshots'
+
+# use shared clipboard and other vmware features
+exec --no-startup-id vmware-user
+
+# use german kexmap
+exec "setxkbmap de"
