@@ -126,6 +126,7 @@ export EDITOR="/usr/bin/vim"
 alias ag='sudo apt-get'
 alias ac='apt-cache'
 alias ap='sudo aptitude'
+alias spruch="curl --silent http://sprichwortgenerator.de | sed -n 's|<div class=\"spwort\">\([^<]*\)</div>|\1|p'"
 
 # enable color support of ls
 if [ "$TERM" != "dumb" ]; then
