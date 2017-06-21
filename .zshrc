@@ -61,7 +61,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep -i'
-alias v='vim'
+alias v='vim --servername VIM'
 alias sv='sudo vim'
 
 # ssh aliases
@@ -115,10 +115,8 @@ vto() {
 }
 
 ## keybindings
-
 bindkey "OA"  history-beginning-search-backward
 bindkey "OB"  history-beginning-search-forward
-
 
 export EDITOR="/usr/bin/vim"
 

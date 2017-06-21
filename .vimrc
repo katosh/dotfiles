@@ -1,9 +1,6 @@
 " Use Vim settings, rather than Vi settings (much better!).
 set nocompatible
 
-" dont replace '_' by ' <- '
-let vimrplugin_assign = 0
-
 " Vundle
 filetype off                  " required
 " set the runtime path to include Vundle and initialize
@@ -17,10 +14,13 @@ Plugin 'VundleVim/Vundle.vim'
 
 " my plugins
 "Plugin 'Vim-R-plugin'
+"Plugin 'jalvesaq/R-Vim-runtime'
+Plugin 'jalvesaq/Nvim-R'
 Plugin 'screen.vim'
 Plugin 'vim-pandoc/vim-rmarkdown'
 Plugin 'vim-pandoc/vim-pandoc-syntax'
 Plugin 'derekwyatt/vim-scala'
+Plugin 'nelstrom/vim-markdown-folding'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -203,6 +203,10 @@ vmap <Space> <Plug>RDSendSelection
 " send line to R with space bar
 nmap <Space> <Plug>RDSendLine
 " dont replace '_' by ' <- '
-let vimrplugin_assign = 0
+let R_assign = 0
+let R_in_buffer = 0
+let R_applescript = 0
+let R_tmux_split = 1
+let R_notmuxconf = 1
 " Rmd syntax highligh
 let rmd_syn_hl_chunk = 1
