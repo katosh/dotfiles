@@ -23,8 +23,6 @@ call vundle#rc()
 " Git repos on your local machine (i.e. when working on your own plugin)
 "Bundle 'file:///Users/gmarik/path/to/plugin'
 " ...
-Bundle 'nelstrom/vim-markdown-folding'
-Bundle 'Vim-R-plugin'
 
 filetype plugin indent on     " required!
 "
