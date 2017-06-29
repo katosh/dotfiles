@@ -164,7 +164,7 @@ sfn(){
 
 # display csv
 dcsv(){
-    cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
+    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | less -N -S
 }
 dccsv(){
     cat $* | column -s"," -t | less -N -S
