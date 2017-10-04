@@ -21,6 +21,7 @@ Plugin 'vim-pandoc/vim-rmarkdown'
 Plugin 'vim-pandoc/vim-pandoc-syntax'
 Plugin 'derekwyatt/vim-scala'
 Plugin 'nelstrom/vim-markdown-folding'
+Plugin 'vim-scripts/diffchar.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -210,3 +211,5 @@ let R_tmux_split = 1
 let R_notmuxconf = 1
 " Rmd syntax highligh
 let rmd_syn_hl_chunk = 1
+" vimdiff colors
+let g:DiffColors=100
