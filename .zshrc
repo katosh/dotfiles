@@ -172,6 +172,12 @@ dccsv(){
 dtab(){
     cat $* | column -t | less -N -S
 }
+dctsv(){
+    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | less -N -S
+}
+dgtf(){
+    {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | less -N -S
+}
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
 }
