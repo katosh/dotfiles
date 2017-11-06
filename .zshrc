@@ -163,21 +163,11 @@ sfn(){
 }
 
 alternateColor() {
+    (( i = 1 ))
     while read line
     do
-      echo -e "\e[31m$line"
-      read line
-      echo -e "\e[32m$line"
-      read line
-      echo -e "\e[33m$line"
-      read line
-      echo -e "\e[34m$line"
-      read line
-      echo -e "\e[35m$line"
-      read line
-      echo -e "\e[36m$line"
-      read line
-      echo -e "\e[37m$line"
+        echo -e "\e[$(( i % 6 + 36 ))m$line"
+        (( i = i - 1 ))
     done
     echo -en "\e[0m"
 }
