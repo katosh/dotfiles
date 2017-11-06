@@ -162,21 +162,41 @@ sfn(){
     find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
 }
 
+alternateColor() {
+    while read line
+    do
+      echo -e "\e[31m$line"
+      read line
+      echo -e "\e[32m$line"
+      read line
+      echo -e "\e[33m$line"
+      read line
+      echo -e "\e[34m$line"
+      read line
+      echo -e "\e[35m$line"
+      read line
+      echo -e "\e[36m$line"
+      read line
+      echo -e "\e[37m$line"
+    done
+    echo -en "\e[0m"
+}
+
 # display csv
 dcsv(){
-    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | less -N -S
+    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | alternateColor | less -N -S
 }
 dccsv(){
-    cat $* | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | less -N -S
+    cat $* | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | alternateColor | less -N -S
 }
-dtab(){
-    cat $* | column -t | less -N -S
+dtsv(){
+    cat $* | column -t | alternateColor | less -N -S
 }
 dctsv(){
-    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | less -N -S
+    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor | less -N -S
 }
 dgtf(){
-    {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | less -N -S
+    {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | alternateColor | less -N -S
 }
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
