@@ -1,3 +1,6 @@
 [submodule ".vim/bundle/Vundle.vim"]
 	path = .vim/bundle/Vundle.vim
 	url = https://github.com/VundleVim/Vundle.vim.git
+[submodule ".vim/bundle/diffchar.vim"]
+	path = .vim/bundle/diffchar.vim
+	url = https://github.com/vim-scripts/diffchar.vim.git

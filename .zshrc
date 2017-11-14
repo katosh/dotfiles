@@ -61,7 +61,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep -i'
-alias v='vim'
+alias v='vim --servername VIM'
 alias sv='sudo vim'
 
 # ssh aliases
@@ -115,10 +115,8 @@ vto() {
 }
 
 ## keybindings
-
 bindkey "OA"  history-beginning-search-backward
 bindkey "OB"  history-beginning-search-forward
-
 
 export EDITOR="/usr/bin/vim"
 
@@ -164,19 +162,98 @@ sfn(){
     find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
 }
 
+alternateColor() {
+    (( i = 1 ))
+    while read line
+    do
+        echo -e "\e[$(( i % 6 + 36 ))m$line"
+        (( i = i - 1 ))
+    done
+    echo -en "\e[0m"
+}
+
 # display csv
 dcsv(){
-    cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
+    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | alternateColor | less -N -S
+}
+dccsv(){
+    cat $* | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | alternateColor | less -N -S
+}
+dtsv(){
+    cat $* | column -t | alternateColor | less -N -S
+}
+dctsv(){
+    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor | less -N -S
+}
+dgtf(){
+    {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | alternateColor | less -N -S
 }
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
 }
+alias initRM="/bin/ls > README"
 
 # use oh-my-zsh if exists
 # to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
     export ZSH=$HOME/.oh-my-zsh
     ZSH_THEME="robbyrussell"
-    plugins=(git globalias tmux)
+    plugins=(git tmux)
     source $ZSH/oh-my-zsh.sh
 fi
+
+# my expand aliases
+globalias() {
+   zle _expand_alias
+   zle expand-word
+}
+zle -N globalias
+bindkey "^ " globalias
+
+# Complete words from tmux pane(s) {{{1
+# Source: http://blog.plenz.com/2012-01/zsh-complete-words-from-tmux-pane.html
+# Gist: https://gist.github.com/blueyed/6856354
+_tmux_pane_words() {
+  local expl
+  local -a w
+  if [[ -z "$TMUX_PANE" ]]; then
+    _message "not running inside tmux!"
+    return 1
+  fi
+
+  # Based on vim-tmuxcomplete's splitwords function.
+  # https://github.com/wellle/tmux-complete.vim/blob/master/sh/tmuxcomplete
+  _tmux_capture_pane() {
+    tmux capture-pane -J -p -S -100 $@ |
+      # Remove "^C".
+      sed 's/\^C\S*/ /g' |
+      # copy lines and split words
+      sed -e 'p;s/[^a-zA-Z0-9_]/ /g' |
+      # split on spaces
+      tr -s '[:space:]' '\n' |
+      # remove surrounding non-word characters
+      =grep -o "\w.*\w"
+  }
+  # Capture current pane first.
+  w=( ${(u)=$(_tmux_capture_pane)} )
+  echo $w > /tmp/w1
+  local i
+  for i in $(tmux list-panes -F '#D'); do
+    # Skip current pane (handled before).
+    [[ "$TMUX_PANE" = "$i" ]] && continue
+    w+=( ${(u)=$(_tmux_capture_pane -t $i)} )
+  done
+  _wanted values expl 'words from current tmux pane' compadd -a w
+}
+
+zle -C tmux-pane-words-prefix   complete-word _generic
+zle -C tmux-pane-words-anywhere complete-word _generic
+bindkey '^Xt' tmux-pane-words-prefix
+bindkey '^X^X' tmux-pane-words-anywhere
+zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' completer _tmux_pane_words
+zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' ignore-line current
+# Display the (interactive) menu on first execution of the hotkey.
+zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' menu yes select interactive
+# zstyle ':completion:tmux-pane-words-anywhere:*' matcher-list 'b:=* m:{A-Za-z}={a-zA-Z}'
+zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' matcher-list 'b:=* m:{A-Za-z}={a-zA-Z}'
+# }}}
