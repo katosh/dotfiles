@@ -61,7 +61,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep -i'
-alias v='vim --servername VIM'
+alias v='vim'
 alias sv='sudo vim'
 
 # ssh aliases
