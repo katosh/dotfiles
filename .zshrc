@@ -50,6 +50,9 @@ zstyle ':completion:*' group-name ''
 # completion menu
 zstyle ':completion:*' menu select=2
 
+# completion files
+fpath=(~/.zsh/completion $fpath)
+
 # some options
 setopt append_history
 setopt extended_history # time log
