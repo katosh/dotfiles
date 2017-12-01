@@ -173,18 +173,46 @@ alternateColor() {
 }
 
 # display csv
-dcsv(){
-    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | alternateColor | less -N -S
-}
-dccsv(){
-    cat $* | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | alternateColor | less -N -S
-}
-dtsv(){
-    cat $* | column -t | alternateColor | less -N -S
-}
-dctsv(){
-    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor | less -N -S
-}
+dcsv()(
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dccsv()(
+    task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dtsv()(
+    task(){cat - | sed -e 's/\t\t/\t \t/g'| column -s$'\t' -t | alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dctsv()(
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
 dgtf(){
     {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | alternateColor | less -N -S
 }
