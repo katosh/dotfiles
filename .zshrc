@@ -173,8 +173,9 @@ alternateColor() {
 }
 
 # display csv
+# column.py is from https://github.com/hq6/column
 dcsv()(
-    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | alternateColor | less -NS}
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column.py -s";" | alternateColor | less -NS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -184,7 +185,7 @@ dcsv()(
     fi
 )
 dccsv()(
-    task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | alternateColor | less -NS}
+    task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^\,/ ,/g' | column.py -s"," | alternateColor | less -NS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -194,7 +195,7 @@ dccsv()(
     fi
 )
 dtsv()(
-    task(){cat - | sed -e 's/\t\t/\t \t/g'| column -s$'\t' -t | alternateColor | less -NS}
+    task(){cat - | tr "\t" ";" | dcsv}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -213,9 +214,17 @@ dctsv()(
       cat - | task
     fi
 )
-dgtf(){
-    {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | alternateColor | less -N -S
-}
+dgtf()(
+    task(){echo $* | grep "^#"; echo $* | grep -v "^#" | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+          input=$(cat $*)
+      fi
+    else
+        input=$(cat -)
+    fi
+    task $input | less -NS
+)
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
 }
