@@ -56,21 +56,6 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-# aliases for most used calls
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias -g g='| grep -i'
-alias v='vim --servername VIM'
-alias sv='sudo vim'
-
-# ssh aliases
-alias Mi='ssh -X mi'
-alias Zedat='ssh -X zedat'
-alias Pi='ssh -X pi'
-alias Piw='ssh -X piw'
-alias Pii='ssh -X pii'
-
 # tmux 256 color support
 alias tmux="tmux -2"
 
@@ -97,17 +82,6 @@ export PYTHONSTARTUP="$HOME/.pythonrc"
 # python site packages
 export PYTHONPATH=/usr/local/lib/python3.3/site-packages
 
-# git aliases
-alias gco='git checkout'
-alias gci='git commit -am'
-alias grb='git rebase'
-alias gpu='git push'
-alias gpl='git pull'
-alias gme='git merge --no-commit'
-
-# favorit rsync
-alias c='rsync -ah --progress'
-
 ## some automations
 # vim open filetype in taps
 vto() {
@@ -132,9 +106,6 @@ if [ "$TERM" != "dumb" ]; then
 fi
 #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LS_COLORS
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
 
 # Tockens
 if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
@@ -143,16 +114,6 @@ if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
-
-# bitly alias
-if [ -f $HOME/Scripts/bitly.py ]; then
-    alias bitly='$HOME/Scripts/bitly.py'
-fi
-
-# matlab alias
-if command -v matlab >/dev/null 2>&1; then
-    alias matl='matlab -nodesktop -nosplash'
-fi
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
@@ -228,15 +189,56 @@ dgtf()(
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
 }
-alias initRM="/bin/ls > README"
 
 # use oh-my-zsh if exists
 # to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
     export ZSH=$HOME/.oh-my-zsh
     ZSH_THEME="robbyrussell"
-    plugins=(git tmux)
+    plugins=(git tmux zsh-autosuggestions zsh-syntax-highlighting)
     source $ZSH/oh-my-zsh.sh
+fi
+
+alias initRM="/bin/ls > README"
+
+# git aliases
+alias gco='git checkout'
+alias gci='git commit -am'
+alias grb='git rebase'
+alias gpu='git push'
+alias gpl='git pull'
+alias gme='git merge --no-commit'
+
+# aliases for most used calls
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -g g='| grep -i'
+alias v='vim --servername VIM'
+alias sv='sudo vim'
+
+# ssh aliases
+alias Mi='ssh -X mi'
+alias Zedat='ssh -X zedat'
+alias Pi='ssh -X pi'
+alias Piw='ssh -X piw'
+alias Pii='ssh -X pii'
+
+# favorit rsync
+alias c='rsync -ah --progress'
+
+alias la='ls -a'
+alias ll='ls -lA'          # ohne . und ..
+alias llh='ls -lh'
+
+# bitly alias
+if [ -f $HOME/Scripts/bitly.py ]; then
+    alias bitly='$HOME/Scripts/bitly.py'
+fi
+
+# matlab alias
+if command -v matlab >/dev/null 2>&1; then
+    alias matl='matlab -nodesktop -nosplash'
 fi
 
 # my expand aliases
