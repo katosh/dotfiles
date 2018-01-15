@@ -22,6 +22,7 @@ Plugin 'vim-pandoc/vim-pandoc-syntax'
 Plugin 'derekwyatt/vim-scala'
 Plugin 'nelstrom/vim-markdown-folding'
 Plugin 'vim-scripts/diffchar.vim'
+Plugin 'vim-syntastic/syntastic'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -113,9 +114,9 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
-" highlight overlength line parts
-highlight OverLength ctermbg=red ctermfg=white guibg=#d70000
-match OverLength /\%80v.\+/
+" show overlength (80 char)
+highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+match OverLength /\%81v.\+/
 
 " show trailing white space
 highlight ExtraWhitespace ctermbg=red guibg=red
@@ -213,3 +214,14 @@ let R_notmuxconf = 1
 let rmd_syn_hl_chunk = 1
 " vimdiff colors
 let g:DiffColors=100
+" R syntax check by syntastic plugin
+let g:syntastic_enable_r_lintr_checker = 1
+let g:syntastic_r_checkers = ['lintr']
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_r_lintr_linters = "with_defaults(assignment_linter = NULL, absolute_paths_linter = NULL)"

@@ -198,6 +198,7 @@ if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
     plugins=(git tmux zsh-autosuggestions zsh-syntax-highlighting)
     source $ZSH/oh-my-zsh.sh
 fi
+export DISABLE_AUTO_TITLE=true
 
 alias initRM="/bin/ls > README"
 
@@ -275,7 +276,6 @@ _tmux_pane_words() {
   }
   # Capture current pane first.
   w=( ${(u)=$(_tmux_capture_pane)} )
-  echo $w > /tmp/w1
   local i
   for i in $(tmux list-panes -F '#D'); do
     # Skip current pane (handled before).
@@ -296,3 +296,12 @@ zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' menu yes select interac
 # zstyle ':completion:tmux-pane-words-anywhere:*' matcher-list 'b:=* m:{A-Za-z}={a-zA-Z}'
 zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' matcher-list 'b:=* m:{A-Za-z}={a-zA-Z}'
 # }}}
+
+_glcompleter() {
+    read -l
+    local cl="$REPLY"
+    read -ln
+    local cp="$REPLY"
+    reply=(`COMP_LINE="$cl" COMP_POINT="$cp" gl`)
+}
+compctl -K _glcompleter gl
