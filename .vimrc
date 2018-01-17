@@ -114,13 +114,9 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
-" show overlength (80 char)
-highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-match OverLength /\%81v.\+/
-
-" show trailing white space
-highlight ExtraWhitespace ctermbg=red guibg=red
-match ExtraWhitespace /\s\+$/
+" show trailing white space and overlength (80 char)
+highlight undesiredChars ctermbg=red ctermfg=white guibg=red
+match undesiredChars /\s\+$\|\%81v.\+/
 
 " alias to delete trailing white spaces
 :command Dws %s/\s\+$//g
