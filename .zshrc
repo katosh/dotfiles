@@ -146,7 +146,8 @@ dcsv()(
     fi
 )
 dccsv()(
-    task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^\,/ ,/g' | column.py -s"," | alternateColor | less -NS}
+    task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^\,/ ,/g' | column.py -s"," |
+        alternateColor | less -NS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -166,7 +167,8 @@ dtsv()(
     fi
 )
 dctsv()(
-    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor | less -NS}
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' |
+        column -s";"$'\t' -t | alternateColor | less -NS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -176,7 +178,8 @@ dctsv()(
     fi
 )
 dgtf()(
-    task(){echo $* | grep "^#"; echo $* | grep -v "^#" | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor}
+    task(){echo $* | grep "^#"; echo $* | grep -v "^#" | sed -e 's/;;/; ;/g' |
+        sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
           input=$(cat $*)
