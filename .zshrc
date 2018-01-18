@@ -189,6 +189,11 @@ dgtf()(
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
 }
+# a function to pass the absolut path to a given file
+p(){
+    (cd $(dirname "$1")
+    echo "$(pwd -P)/$(basename "$1")")
+}
 
 # use oh-my-zsh if exists
 # to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
