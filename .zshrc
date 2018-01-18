@@ -136,7 +136,8 @@ alternateColor() {
 # display csv
 # column.py is from https://github.com/hq6/column
 dcsv()(
-    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column.py -s";" | alternateColor | less -NS}
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column.py -s";" |
+        alternateColor | less -NS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -199,6 +200,24 @@ p(){
     else
         (cd $(dirname "$1"); echo "$(pwd -P)/$(basename "$1")")
     fi
+}
+# a function to find all git repos with http(s) and ssh remotes
+gitR() {
+    (echo -e "DIRECTORY\t---\tREMOTE"
+    find $HOME/Projects -name HEAD \
+        -execdir test -e refs -a -e objects -a -e config \; -printf %h\\n |
+    while read repo; do
+        DIR=${$(dirname "$repo")/$HOME/\~}
+        git --git-dir="$repo" remote -v | awk '{print $2}' |
+            grep -E 'http|@' | sort | uniq |
+        while read remote; do
+            if [[ "$remote" =~ "http.*" ]]; then
+                echo -e "$DIR\t---\t${remote##http?://}"
+            else
+                echo -e "$DIR\t---\t${${${remote/*@/}/://}%%.git}"
+            fi
+        done
+    done) | alternateColor
 }
 
 # use oh-my-zsh if exists
