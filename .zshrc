@@ -203,8 +203,9 @@ p(){
 }
 # a function to find all git repos with http(s) and ssh remotes
 gitR() {
+    [[ $# -eq 0 ]] && dir="$HOME/Projects" || dir="$*"
     echo -e "DIRECTORY\tREMOTE"
-    find $HOME/Projects -name HEAD \
+    find "$dir" -name HEAD \
         -execdir test -e refs -a -e objects -a -e config \; -printf %h\\n |
     while read repo; do
         DIR=${$(dirname "$repo")/$HOME/\~}
