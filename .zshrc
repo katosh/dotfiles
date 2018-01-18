@@ -203,7 +203,7 @@ p(){
 }
 # a function to find all git repos with http(s) and ssh remotes
 gitR() {
-    (echo -e "DIRECTORY\t---\tREMOTE"
+    echo -e "DIRECTORY\tREMOTE"
     find $HOME/Projects -name HEAD \
         -execdir test -e refs -a -e objects -a -e config \; -printf %h\\n |
     while read repo; do
@@ -212,12 +212,12 @@ gitR() {
             grep -E 'http|@' | sort | uniq |
         while read remote; do
             if [[ "$remote" =~ "http.*" ]]; then
-                echo -e "$DIR\t---\t${remote##http?://}"
+                echo -e "$DIR\t${remote##http?://}"
             else
-                echo -e "$DIR\t---\t${${${remote/*@/}/://}%%.git}"
+                echo -e "$DIR\t${${${remote/*@/}/://}%%.git}"
             fi
         done
-    done) | alternateColor
+    done
 }
 
 # use oh-my-zsh if exists
