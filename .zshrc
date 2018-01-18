@@ -194,8 +194,11 @@ stdl(){
 }
 # a function to pass the absolut path to a given file
 p(){
-    (cd $(dirname "$1")
-    echo "$(pwd -P)/$(basename "$1")")
+    if [[ -d "$1" ]]; then
+        (cd "$1"; pwd -P)
+    else
+        (cd $(dirname "$1"); echo "$(pwd -P)/$(basename "$1")")
+    fi
 }
 
 # use oh-my-zsh if exists
