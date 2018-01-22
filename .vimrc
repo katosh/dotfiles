@@ -189,6 +189,7 @@ let vimrplugin_conqueplugin = 0
 let g:vimrplugin_map_r = 1
 " see R documentation in a Vim buffer
 let vimrplugin_vimpager = "no"
+let g:R_tmux_title = ""
 "set expandtab
 set shiftwidth=4
 set tabstop=4
