@@ -20,4 +20,6 @@
 [pack]
     windowMemory = 1000m
     packSizeLimit = 1000m
-    threads = 2
+    threads = 8
+[merge]
+	ff = false

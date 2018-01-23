@@ -59,21 +59,6 @@ setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
 
-# aliases for most used calls
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias -g g='| grep -i'
-alias v='vim'
-alias sv='sudo vim'
-
-# ssh aliases
-alias Mi='ssh -X mi'
-alias Zedat='ssh -X zedat'
-alias Pi='ssh -X pi'
-alias Piw='ssh -X piw'
-alias Pii='ssh -X pii'
-
 # tmux 256 color support
 alias tmux="tmux -2"
 
@@ -100,17 +85,6 @@ export PYTHONSTARTUP="$HOME/.pythonrc"
 # python site packages
 export PYTHONPATH=/usr/local/lib/python3.3/site-packages
 
-# git aliases
-alias gco='git checkout'
-alias gci='git commit -am'
-alias grb='git rebase'
-alias gpu='git push'
-alias gpl='git pull'
-alias gme='git merge --no-commit'
-
-# favorit rsync
-alias c='rsync -ah --progress'
-
 ## some automations
 # vim open filetype in taps
 vto() {
@@ -135,9 +109,6 @@ if [ "$TERM" != "dumb" ]; then
 fi
 #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LS_COLORS
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
 
 # Tockens
 if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
@@ -146,16 +117,6 @@ if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
-
-# bitly alias
-if [ -f $HOME/Scripts/bitly.py ]; then
-    alias bitly='$HOME/Scripts/bitly.py'
-fi
-
-# matlab alias
-if command -v matlab >/dev/null 2>&1; then
-    alias matl='matlab -nodesktop -nosplash'
-fi
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
@@ -176,33 +137,143 @@ alternateColor() {
 }
 
 # display csv
-dcsv(){
-    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";" -t | alternateColor | less -N -S
-}
-dccsv(){
-    cat $* | sed -e 's/,,/, ,/g' | sed -e 's/^,/ ,/g' | column -s"," -t | alternateColor | less -N -S
-}
-dtsv(){
-    cat $* | column -t | alternateColor | less -N -S
-}
-dctsv(){
-    cat $* | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor | less -N -S
-}
-dgtf(){
-    {grep "^#" $*; grep -v "^#" $*| sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column -s";"$'\t' -t} | alternateColor | less -N -S
-}
+# column.py is from https://github.com/hq6/column
+dcsv()(
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column.py -s";" |
+        alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dccsv()(
+    task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^\,/ ,/g' | column.py -s"," |
+        alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dtsv()(
+    task(){cat - | tr "\t" ";" | dcsv}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dctsv()(
+    task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' |
+        column -s";"$'\t' -t | alternateColor | less -NS}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+        cat $* | task
+      fi
+    else
+      cat - | task
+    fi
+)
+dgtf()(
+    task(){echo $* | grep "^#"; echo $* | grep -v "^#" | sed -e 's/;;/; ;/g' |
+        sed -e 's/^;/ ;/g' | column -s";"$'\t' -t | alternateColor}
+    if [ -t 0 ]; then
+      if [ $# -gt 0 ]; then
+          input=$(cat $*)
+      fi
+    else
+        input=$(cat -)
+    fi
+    task $input | less -NS
+)
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
 }
-alias initRM="/bin/ls > README"
+# a function to pass the absolut path to a given file
+p(){
+    if [[ -d "$1" ]]; then
+        (cd "$1"; pwd -P)
+    else
+        (cd $(dirname "$1"); echo "$(pwd -P)/$(basename "$1")")
+    fi
+}
+# a function to find all git repos with http(s) and ssh remotes
+gitR() {
+    [[ $# -eq 0 ]] && dir="$HOME/Projects" || dir="$*"
+    echo -e "DIRECTORY\tREMOTE"
+    find "$dir" -name HEAD \
+        -execdir test -e refs -a -e objects -a -e config \; -printf %h\\n |
+    while read repo; do
+        DIR=${$(dirname "$repo")/$HOME/\~}
+        git --git-dir="$repo" remote -v | awk '{print $2}' |
+            grep -E 'http|@' | sort | uniq |
+        while read remote; do
+            if [[ "$remote" =~ "http.*" ]]; then
+                echo -e "$DIR\t${remote##http?://}"
+            else
+                echo -e "$DIR\t${${${remote/*@/}/://}%%.git}"
+            fi
+        done
+    done
+}
 
 # use oh-my-zsh if exists
 # to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
     export ZSH=$HOME/.oh-my-zsh
     ZSH_THEME="robbyrussell"
-    plugins=(git tmux)
+    plugins=(git tmux zsh-autosuggestions zsh-syntax-highlighting)
     source $ZSH/oh-my-zsh.sh
+fi
+export DISABLE_AUTO_TITLE=true
+
+alias initRM="/bin/ls > README"
+
+# git aliases
+alias gco='git checkout'
+alias gci='git commit -am'
+alias grb='git rebase'
+alias gpu='git push'
+alias gpl='git pull'
+alias gme='git merge --no-commit'
+
+# aliases for most used calls
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -g g='| grep -i'
+alias v='vim'
+alias sv='sudo vim'
+
+# ssh aliases
+alias Mi='ssh -X mi'
+alias Zedat='ssh -X zedat'
+alias Pi='ssh -X pi'
+alias Piw='ssh -X piw'
+alias Pii='ssh -X pii'
+
+# favorit rsync
+alias c='rsync -ah --progress'
+
+alias la='ls -a'
+alias ll='ls -lA'          # ohne . und ..
+alias llh='ls -lh'
+
+# bitly alias
+if [ -f $HOME/Scripts/bitly.py ]; then
+    alias bitly='$HOME/Scripts/bitly.py'
+fi
+
+# matlab alias
+if command -v matlab >/dev/null 2>&1; then
+    alias matl='matlab -nodesktop -nosplash'
 fi
 
 # my expand aliases
@@ -239,7 +310,6 @@ _tmux_pane_words() {
   }
   # Capture current pane first.
   w=( ${(u)=$(_tmux_capture_pane)} )
-  echo $w > /tmp/w1
   local i
   for i in $(tmux list-panes -F '#D'); do
     # Skip current pane (handled before).
@@ -260,3 +330,12 @@ zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' menu yes select interac
 # zstyle ':completion:tmux-pane-words-anywhere:*' matcher-list 'b:=* m:{A-Za-z}={a-zA-Z}'
 zstyle ':completion:tmux-pane-words-(prefix|anywhere):*' matcher-list 'b:=* m:{A-Za-z}={a-zA-Z}'
 # }}}
+
+_glcompleter() {
+    read -l
+    local cl="$REPLY"
+    read -ln
+    local cp="$REPLY"
+    reply=(`COMP_LINE="$cl" COMP_POINT="$cp" gl`)
+}
+compctl -K _glcompleter gl
