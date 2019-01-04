@@ -77,11 +77,6 @@ setopt correct
 # for fast renaming with regular expressions
 autoload -U zmv
 
-# python config with autocompletion
-export PYTHONSTARTUP="$HOME/.pythonrc"
-# python site packages
-export PYTHONPATH=/usr/local/lib/python3.3/site-packages
-
 ## some automations
 # vim open filetype in taps
 vto() {
@@ -137,7 +132,7 @@ alternateColor() {
 # column.py is from https://github.com/hq6/column
 dcsv()(
     task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' | column.py -s";" |
-        alternateColor | less -NS}
+        alternateColor | less -RNS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -148,7 +143,7 @@ dcsv()(
 )
 dccsv()(
     task(){cat - | sed -e 's/,,/, ,/g' | sed -e 's/^\,/ ,/g' | column.py -s"," |
-        alternateColor | less -NS}
+        alternateColor | less -RNS}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -169,7 +164,7 @@ dtsv()(
 )
 dctsv()(
     task(){cat - | sed -e 's/;;/; ;/g' | sed -e 's/^;/ ;/g' |
-        column -s";"$'\t' -t | alternateColor | less -NS}
+        column -s";"$'\t' -t | alternateColor | less -NSR}
     if [ -t 0 ]; then
       if [ $# -gt 0 ]; then
         cat $* | task
@@ -188,7 +183,7 @@ dgtf()(
     else
         input=$(cat -)
     fi
-    task $input | less -NS
+    task $input | less -NSR
 )
 stdl(){
     ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
@@ -223,12 +218,13 @@ gitR() {
 
 # use oh-my-zsh if exists
 # to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
-    export ZSH=$HOME/.oh-my-zsh
-    ZSH_THEME="robbyrussell"
-    plugins=(git tmux zsh-autosuggestions zsh-syntax-highlighting)
-    source $ZSH/oh-my-zsh.sh
-fi
+#if [[ (-f $HOME/.oh-my-zsh/oh-my-zsh.sh) && ($(hostname) != "ribnodevm1404") ]]; then
+#    export ZSH=$HOME/.oh-my-zsh
+#    DEFAULT_USER="dominik.otto"
+#    ZSH_THEME="robbyrussell"
+#    plugins=(git zsh-autosuggestions zsh-syntax-highlighting vi-mode)
+#    source $ZSH/oh-my-zsh.sh
+#fi
 export DISABLE_AUTO_TITLE=true
 
 alias initRM="/bin/ls > README"
@@ -248,6 +244,10 @@ alias ....='cd ../../..'
 alias -g g='| grep -i'
 alias v='vim --servername VIM'
 alias sv='sudo vim'
+
+# feh aliases
+alias pfeh='feh --magick-timeout 1'
+alias sfeh='feh --scale-down --auto-zoom'
 
 # ssh aliases
 alias Mi='ssh -X mi'

@@ -128,11 +128,11 @@ cmap w!! w !sudo tee > /dev/null %
 """ BINDINGS """
 
 " tab navigation
-nnoremap <C-a> :tabprevious<CR>
-nnoremap <C-y> :tabnext<CR>
+nnoremap <C-y> :tabprevious<CR>
+nnoremap <C-x> :tabnext<CR>
 nnoremap <C-t> :tabnew<CR>
-inoremap <C-a> <Esc>:tabprevious<CR>i
-inoremap <C-y> <Esc>:tabnext<CR>i
+inoremap <C-y> <Esc>:tabprevious<CR>i
+inoremap <C-x> <Esc>:tabnext<CR>i
 inoremap <C-t> <Esc>:tabnew<CR>
 
 " Indent Python in the Google way.
