@@ -3,6 +3,7 @@
 	email = dominik.otto@gmail.com
 [core]
 	editor = vim
+	autocrlf = true
 [push]
 	default = simple
 [color]
