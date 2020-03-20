@@ -5,28 +5,39 @@ set nocompatible
 filetype off                  " required
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
+call plug#begin('~/.vim/plugged')
 
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
+"Plug 'Vim-R-plugin'
+"Plug 'jalvesaq/R-Vim-runtime'
+Plug 'jalvesaq/Nvim-R'
+"Plug 'screen.vim'
+"Plug 'vim-pandoc/vim-rmarkdown'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'derekwyatt/vim-scala'
+Plug 'nvie/vim-flake8'
+Plug 'Vimjas/vim-python-pep8-indent'
+"Plug 'gryf/pylint-vim'
+"Plug 'nelstrom/vim-markdown-folding'
+"Plug 'vim-scripts/diffchar.vim'
+"Plug 'vim-syntastic/syntastic'
+"
+"Plug 'dense-analysis/ale'
 
-" my plugins
-"Plugin 'Vim-R-plugin'
-"Plugin 'jalvesaq/R-Vim-runtime'
-Plugin 'jalvesaq/Nvim-R'
-Plugin 'screen.vim'
-Plugin 'vim-pandoc/vim-rmarkdown'
-Plugin 'vim-pandoc/vim-pandoc-syntax'
-Plugin 'derekwyatt/vim-scala'
-Plugin 'nelstrom/vim-markdown-folding'
-Plugin 'vim-scripts/diffchar.vim'
-Plugin 'vim-syntastic/syntastic'
+" ncm-R
+"Plug 'ncm2/ncm2'
+Plug 'roxma/nvim-yarp'
+Plug 'gaalcaras/ncm-R'
+"Plug 'roxma/nvim-completion-manager'
+"Plug 'sirver/UltiSnips'
+"Plug 'ncm2/ncm2-ultisnips'
+Plug 'lervag/vimtex'
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
+" Vim 8 only
+if !has('nvim')
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
+
+call plug#end()
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -37,7 +48,7 @@ filetype plugin indent on    " required
 " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 "
 " see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+" Put your non-Plug stuff after this line
 
 " End Vundle
 
@@ -128,11 +139,11 @@ cmap w!! w !sudo tee > /dev/null %
 """ BINDINGS """
 
 " tab navigation
-nnoremap <C-y> :tabprevious<CR>
-nnoremap <C-x> :tabnext<CR>
+"nnoremap <C-y> :tabprevious<CR>
+nnoremap <S-y> :tabprevious<CR>
+nnoremap <C-y> :tabnext<CR>
 nnoremap <C-t> :tabnew<CR>
-inoremap <C-y> <Esc>:tabprevious<CR>i
-inoremap <C-x> <Esc>:tabnext<CR>i
+inoremap <C-y> <Esc>:tabnext<CR>i
 inoremap <C-t> <Esc>:tabnew<CR>
 
 " Indent Python in the Google way.
@@ -187,9 +198,6 @@ let g:vimrplugin_screenplugin = 1
 let vimrplugin_conqueplugin = 0
 " map the letter 'r' to send visually selected lines to R
 let g:vimrplugin_map_r = 1
-" see R documentation in a Vim buffer
-let vimrplugin_vimpager = "no"
-let g:R_tmux_title = ""
 "set expandtab
 set shiftwidth=4
 set tabstop=4
@@ -201,25 +209,31 @@ vmap <F2> <Plug>RStart
 vmap <Space> <Plug>RDSendSelection
 " send line to R with space bar
 nmap <Space> <Plug>RDSendLine
+" see R documentation in a Vim buffer
+let vimrplugin_vimpager = "no"
+let g:R_tmux_title = ""
 " dont replace '_' by ' <- '
 let R_assign = 0
 let R_in_buffer = 0
+let R_source = "/homes/olymp/dominik.otto/Software/tmux_split.vim"
 let R_applescript = 0
-let R_tmux_split = 1
-let R_notmuxconf = 1
 " Rmd syntax highligh
 let rmd_syn_hl_chunk = 1
+let g:rout_follow_colorscheme = 1
+let g:Rout_more_colors = 1
 " vimdiff colors
 let g:DiffColors=100
 " R syntax check by syntastic plugin
-let g:syntastic_enable_r_lintr_checker = 1
-let g:syntastic_r_checkers = ['lintr']
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-let g:syntastic_always_populate_loc_list = 0
-let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_w = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_r_lintr_linters = "with_defaults(assignment_linter = NULL, absolute_paths_linter = NULL, camel_case_linter = NULL, multiple_dots_linter = NULL, object_usage_linter)"
+"let g:syntastic_enable_r_lintr_checker = 1
+"let g:syntastic_r_checkers = ['lintr']
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+"let g:syntastic_always_populate_loc_list = 0
+"let g:syntastic_auto_loc_list = 0
+"let g:syntastic_check_on_open = 0
+"let g:syntastic_check_on_w = 1
+"let g:syntastic_check_on_wq = 0
+"let g:syntastic_r_lintr_linters = "with_defaults(assignment_linter = NULL, absolute_paths_linter = NULL, camel_case_linter = NULL, multiple_dots_linter = NULL, object_usage_linter)"
+" ncm2
+"autocmd BufEnter * call ncm2#enable_for_buffer()
