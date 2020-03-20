@@ -5,3 +5,6 @@
 
 # vim history
 .vim/.netrwhist
+
+# vim plugins
+.vim/plugged

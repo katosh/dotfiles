@@ -1,9 +1,10 @@
 [user]
 	name = Dominik
-	email = dominik.otto@gmail.com
+	email = dominik.otto@izi.fraunhofer.de
 [core]
-	editor = vim
-	autocrlf = true
+	autocrlf = input
+	editor = nvim
+	eol = lf
 [push]
 	default = simple
 [color]
@@ -21,4 +22,10 @@
 [pack]
     windowMemory = 1000m
     packSizeLimit = 1000m
-    threads = 2
+    threads = 8
+[merge]
+    tool = vimdiff
+    conflictstyle = diff3
+    prompt = false
+[diff "pdf"]
+    command = diffpdf
