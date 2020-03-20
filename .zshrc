@@ -18,8 +18,9 @@ setopt AUTO_PUSHD
 setopt pushdminus # invert +/- arguments
 
 # costemize promt
-#                  normel user        ||       root
-(( EUID )) && PROMPT='%U%n:%m%u %/> ' || PROMPT='%U%n:%m%u %/# '
+#                  normel user     ||       root
+(( EUID )) && PROMPT='%U%n:%m%u> ' || PROMPT='%U%n:%m%u# '
+
 
 # Cache completion for better preformance
 zstyle ':completion:*' use-cache on
