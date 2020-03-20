@@ -1,7 +1,7 @@
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=5000
+HISTSIZE=100000
+SAVEHIST=100000
 setopt appendhistory autocd extendedglob notify
 unsetopt beep
 bindkey -v
@@ -55,6 +55,7 @@ setopt append_history
 setopt extended_history # time log
 setopt share_history
 setopt hist_reduce_blanks
+setopt hist_ignore_all_dups
 
 # tmux 256 color support
 alias tmux="tmux -2"
@@ -80,7 +81,7 @@ autoload -U zmv
 ## some automations
 # vim open filetype in taps
 vto() {
-    vim -p *.$1
+    nvim -p *.$1
 }
 
 ## keybindings
@@ -216,6 +217,10 @@ gitR() {
     done
 }
 
+rmColor(){
+    # Removes ansi terminal colors from text when piped through.
+    sed -r "s/[[:cntrl:]]\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"
+}
 # use oh-my-zsh if exists
 # to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 #if [[ (-f $HOME/.oh-my-zsh/oh-my-zsh.sh) && ($(hostname) != "ribnodevm1404") ]]; then
@@ -231,7 +236,7 @@ alias initRM="/bin/ls > README"
 
 # git aliases
 alias gco='git checkout'
-alias gci='git commit -am'
+alias gci='git commit -m'
 alias grb='git rebase'
 alias gpu='git push'
 alias gpl='git pull'
@@ -242,8 +247,12 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -g g='| grep -i'
-alias v='vim --servername VIM'
-alias sv='sudo vim'
+#alias v='vim --servername VIM'
+alias nv='nvim'
+alias sv='sudo -H vim'
+# fff https://github.com/dylanaraps/fff
+alias f=fff
+
 
 # feh aliases
 alias pfeh='feh --magick-timeout 1'
@@ -255,6 +264,14 @@ alias Zedat='ssh -X zedat'
 alias Pi='ssh -X pi'
 alias Piw='ssh -X piw'
 alias Pii='ssh -X pii'
+
+# locate aliases
+alias lupdatedb="updatedb -o $HOME/.locate.db --require-visibility 0 \
+    --prunefs 'rpc_pipefs cgroup proc ftpfs devfs tmpfs fuse.sshfs curlftpfs \
+    mqueue debugfs fusectl pstore efivarfs hugetlbfs sysfs devtmpfs devpts'
+    chmod 600 $HOME/.locate.db"
+alias llocate="locate --database=$HOME/.locate.db"
+
 
 # favorit rsync
 alias c='rsync -ah --progress'
@@ -336,3 +353,4 @@ _glcompleter() {
     reply=(`COMP_LINE="$cl" COMP_POINT="$cp" gl`)
 }
 compctl -K _glcompleter gl
+
