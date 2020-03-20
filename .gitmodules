@@ -4,3 +4,6 @@
 [submodule ".vim/bundle/diffchar.vim"]
 	path = .vim/bundle/diffchar.vim
 	url = https://github.com/vim-scripts/diffchar.vim.git
+[submodule ".vim/plugged/Nvim-R"]
+	path = .vim/plugged/Nvim-R
+	url = https://github.com/jalvesaq/Nvim-R
