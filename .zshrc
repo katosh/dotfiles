@@ -120,6 +120,11 @@ sfn(){
     find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
 }
 
+# memory usage by user in MB
+usermem(){
+    ps hax -o rss,user | awk '{a[$2]+=$1;}END{for(i in a)print i" "int(a[i]/1024+0.5);}' | sort -rnk2
+}
+
 alternateColor() {
     (( i = 1 ))
     while read line
