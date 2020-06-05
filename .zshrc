@@ -19,7 +19,7 @@ setopt pushdminus # invert +/- arguments
 
 # costemize promt
 #                  normel user     ||       root
-(( EUID )) && PROMPT='%U%n:%m%u> ' || PROMPT='%U%n:%m%u# '
+(( EUID )) && PROMPT='%T:%U%m%u> ' || PROMPT='%U%n:%m%u# '
 
 
 # Cache completion for better preformance
