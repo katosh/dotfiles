@@ -60,12 +60,15 @@ setopt hist_reduce_blanks
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias -g g='| grep'
+alias -g g='| grep -i'
 alias v='vim'
 alias sv='sudo vim'
 
 # tmux 256 color support
 alias tmux="tmux -2"
+
+# test if colors are displayed
+alias coltest='(x=`tput op` y=`printf %76s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done)'
 
 # display most used commands
 alias mostused='fc -l 1 -1|awk '"'"'{print $2}'"'"'|awk '"'"'BEGIN {FS="|"} {print $1}'"'"'|sort|uniq -c|sort -n -r|less'
@@ -104,66 +107,52 @@ vto() {
     vim -p *.$1
 }
 
-## keybindings
-
-bindkey "^[[A"  history-beginning-search-backward
-bindkey "^[[B"  history-beginning-search-forward
-
-
-export PATH="/bin:$PATH"
-export PATH="/sbin:$PATH"
-export PATH="/usr/bin:$PATH"
-export PATH="/usr/sbin:$PATH"
-export PATH="/usr/local/bin:$PATH"
-export PATH="/usr/local/sbin:$PATH"
-export EDITOR="/usr/local/bin/vim"
-# adding /usr/texbin to PATH for MacTeX
-eval `/usr/libexec/path_helper -s`
-# git keychain
-git config --global credential.helper osxkeychain
-# blender in Command-Line
-if [ -e /Applications/Blender/blender.app ]; then
-    alias blender=/Applications/Blender/blender.app/Contents/MacOS/blender
-fi
-# colors for less
-#export LESSOPEN='| ~/.lessfilter'
-if [ source-highlight ]; then
-    export LESSOPEN="$LESSOPEN | source-highlight --style-file=esc-solarized.style -f esc -i"
-fi
-export LESSOPEN="$LESSOPEN %s"
-export LESS=' -R '
-# often used commands
-alias b='brew'
-# enable color support of ls and gls
-if [ "$TERM" != "dumb" ]; then
-        alias ls='ls -GF'
-        export CLICOLOR_FORCE="yes" # force colors
-        if [ command -v gls >/dev/null 2>&1 ]; then
-            alias gls='gls --color=always'
-            eval $(gdircolors $HOME/.dircolors)
-        fi
-fi
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
-alias gla='gls -a'
-alias gll='gls -lA'          # ohne . und ..
-alias gllh='gls -lh'
-
-# programms
-alias matl='/Applications/MATLAB_R2014a.app/bin/matlab -nosplash -nodesktop'
-
 # mutt emaul client
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
 
+# matlab alias
+if command -v matlab >/dev/null 2>&1; then
+    alias matl='matlab -nodesktop -nosplash'
+fi
+
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
 
-# summ disc usage of all files/directorys that fit the name pattern
+# sum disc usage of all files/directorys that fit the name pattern
 sfn(){
-    find . -name "$*" -print0 | gdu --files0-from=- -hc | tail -n1
+    find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
 }
 
-alias rr='/usr/local/bin/r'
+# display csv
+dcsv(){
+    cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
+}
+dccsv(){
+    cat $* | column -s"," -t | less -N -S
+}
+dtab(){
+    cat $* | column -t | less -N -S
+}
+stdl(){
+    ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
+}
+alias initRM="/bin/ls > README"
+
+# use oh-my-zsh if exists
+# to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
+    export ZSH=$HOME/.oh-my-zsh
+    ZSH_THEME="robbyrussell"
+    plugins=(git tmux)
+    source $ZSH/oh-my-zsh.sh
+fi
+
+# my expand aliases
+globalias() {
+   zle _expand_alias
+   zle expand-word
+}
+zle -N globalias
+bindkey "^ " globalias
