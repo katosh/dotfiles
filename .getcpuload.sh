@@ -2,7 +2,7 @@
 
 mynetstatfile=/run/user/$(id -u)/mynetstat
 ( cat $mynetstatfile 2> /dev/null | tr '\n' ' ' ;
-  ( grep 'bond0:' /proc/net/dev |
+  ( grep 'eno1:' /proc/net/dev |
     awk '{sumIn += $2; sumOut += $10;} END {printf "%d %d ",sumIn,sumOut}';
     date +%s%N ) |
         tee $mynetstatfile ) |
