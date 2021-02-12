@@ -82,8 +82,9 @@ autoload -U zmv
 ## some automations
 # vim open filetype in taps
 vto() {
-    nvim -p *.$1
+    vim -p *.$1
 }
+alias v=vim
 
 ## keybindings
 bindkey "OA"  history-beginning-search-backward
@@ -111,9 +112,6 @@ if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
 export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
 export MUTT_REALNAME="Dominik Otto"
 export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
-
-# add local configurations
-if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
 
 # sum disc usage of all files/directorys that fit the name pattern
 sfn(){
@@ -360,3 +358,16 @@ _glcompleter() {
 }
 compctl -K _glcompleter gl
 
+alias nodes="sinfo -No '%N;%t;%f;%m;%e;%z;%O;%G;%v' | uniq | column -t -s ';' | alternateColor"
+alias ishell="srun --mem=4G --cpus-per-task=1 --nodes=1 --ntasks-per-node=1 --time=01:00:00 --pty zsh -i"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# rename tmux pane if #T in pane-border-format
+np(){
+    printf '\033]2;%s\033\\' "$*"
+}
+np '' # clear pane name
+
+# add local configurations
+if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
