@@ -1,8 +1,8 @@
 [user]
 	name = Dominik
-	email = dominik.otto@gmail.com
+	email = dominik.otto@izi.fraunhofer.de
 [core]
-	editor = vim
+	editor = nvim
 [push]
 	default = simple
 [color]
@@ -16,7 +16,14 @@
     pl = pull
 	last = log -1 HEAD
 [credential]
-	helper = osxkeychain
-
+	helper = cache --timeout=3600
+[pack]
+    windowMemory = 1000m
+    packSizeLimit = 1000m
+    threads = 8
+[merge]
+    tool = vimdiff
+    conflictstyle = diff3
+    prompt = false
 [diff "pdf"]
-        textconv = pdf2txt
+    command = diffpdf
