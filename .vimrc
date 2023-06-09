@@ -1,6 +1,57 @@
 " Use Vim settings, rather than Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
 set nocompatible
+
+" Vundle
+filetype off                  " required
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call plug#begin('~/.vim/plugged')
+
+"Plug 'Vim-R-plugin'
+"Plug 'jalvesaq/R-Vim-runtime'
+Plug 'jalvesaq/Nvim-R'
+"Plug 'screen.vim'
+"Plug 'vim-pandoc/vim-rmarkdown'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'derekwyatt/vim-scala'
+Plug 'nvie/vim-flake8'
+Plug 'Vimjas/vim-python-pep8-indent'
+"Plug 'gryf/pylint-vim'
+"Plug 'nelstrom/vim-markdown-folding'
+"Plug 'vim-scripts/diffchar.vim'
+"Plug 'vim-syntastic/syntastic'
+"
+"Plug 'dense-analysis/ale'
+
+" ncm-R
+"Plug 'ncm2/ncm2'
+Plug 'roxma/nvim-yarp'
+Plug 'gaalcaras/ncm-R'
+"Plug 'roxma/nvim-completion-manager'
+"Plug 'sirver/UltiSnips'
+"Plug 'ncm2/ncm2-ultisnips'
+Plug 'lervag/vimtex'
+
+" Vim 8 only
+if !has('nvim')
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
+
+call plug#end()
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plug stuff after this line
+
+" End Vundle
+
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -52,11 +103,14 @@ set incsearch		" do incremental searching
 " scroll bevor hitting the edge
 set scrolloff=4
 set sidescroll=8
+set nospell         " turns on spell check for all files
 
 set nobackup		" do not keep a backup file, use versions instead
 set nowritebackup " no backup while writing
 set noswapfile    " no swap files
 
+" More Tabs
+set tabpagemax=500
 
 """ HIGHLIGHTING """
 
@@ -71,13 +125,9 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
-" highlight overlength line parts
-highlight OverLength ctermbg=red ctermfg=white guibg=#d70000
-match OverLength /\%80v.\+/
-
-" show trailing white space
-highlight ExtraWhitespace ctermbg=red guibg=red
-match ExtraWhitespace /\s\+$/
+" show trailing white space and overlength (80 char)
+highlight undesiredChars ctermbg=red ctermfg=white guibg=red
+match undesiredChars /\s\+$\|\%81v.\+/
 
 " alias to delete trailing white spaces
 :command Dws %s/\s\+$//g
@@ -89,15 +139,101 @@ cmap w!! w !sudo tee > /dev/null %
 """ BINDINGS """
 
 " tab navigation
-nnoremap <C-a> :tabprevious<CR>
+"nnoremap <C-y> :tabprevious<CR>
+nnoremap <S-y> :tabprevious<CR>
 nnoremap <C-y> :tabnext<CR>
 nnoremap <C-t> :tabnew<CR>
-inoremap <C-a> <Esc>:tabprevious<CR>i
 inoremap <C-y> <Esc>:tabnext<CR>i
 inoremap <C-t> <Esc>:tabnew<CR>
 
 " Indent Python in the Google way.
 source ~/.vim_python_style
 
-" More Tabs
-set tabpagemax=30
+""" vim R and screen """
+" Installation
+"       - Place plugin file under ~/.vim/
+"       - To activate help, type in vim :helptags ~/.vim/doc
+"       - Place the following vim conf lines in .vimrc
+" Usage
+"       - Read intro/help in vim with :h vim-r-plugin or :h screen.txt
+"       - To initialize vim/R session, start screen/tmux, open some *.R file in vim and then hit F2 key
+"       - Object/omni completion command CTRL-X CTRL-O
+"       - To update object list for omni completion, run :RUpdateObjList
+" My favorite Vim/R window arrangement
+"   tmux attach
+"   Open *.R file in Vim and hit F2 to open R
+"   Go to R pane and create another pane with C-a %
+"   Open second R session in new pane
+"   Go to vim pane and open a new viewport with :split *.R
+" Useful tmux commands
+"       tmux new -s <myname>       start new session with a specific name
+"   tmux ls (C-a-s)            list tmux session
+"       tmux attach -t <id>        attach to specific session
+"       tmux kill-session -t <id>  kill specific session
+"   C-a-: kill-session         kill a session
+"   C-a %                      split pane vertically
+"       C-a "                      split pane horizontally
+"   C-a-o                      jump cursor to next pane
+"   C-a C-o                    swap panes
+"   C-a-: resize-pane -L 10    resizes pane by 10 to left (L R U D)
+" Corresponding Vim commands
+"   :split or :vsplit      split viewport
+"   C-w-w                  jump cursor to next pane-
+"   C-w-r                  swap viewports
+"   C-w C-++               resize viewports to equal split
+"   C-w 10+                increase size of current pane by value
+
+" To open R in terminal rather than RGui (only necessary on OS X)
+" let vimrplugin_applescript = 0
+" let vimrplugin_screenplugin = 0
+" For tmux support
+let g:ScreenImpl = 'Tmux'
+let vimrplugin_screenvsplit = 1 " For vertical tmux split
+let g:ScreenShellInitialFocus = 'shell'
+" instruct to use your own .screenrc file
+let g:vimrplugin_noscreenrc = 1
+" For integration of r-plugin with screen.vim
+let g:vimrplugin_screenplugin = 1
+" Don't use conque shell if installed
+let vimrplugin_conqueplugin = 0
+" map the letter 'r' to send visually selected lines to R
+let g:vimrplugin_map_r = 1
+"set expandtab
+set shiftwidth=4
+set tabstop=4
+" start R with F2 key
+map <F2> <Plug>RStart
+imap <F2> <Plug>RStart
+vmap <F2> <Plug>RStart
+" send selection to R with space bar
+vmap <Space> <Plug>RDSendSelection
+" send line to R with space bar
+nmap <Space> <Plug>RDSendLine
+" see R documentation in a Vim buffer
+let vimrplugin_vimpager = "no"
+let g:R_tmux_title = ""
+" dont replace '_' by ' <- '
+let R_assign = 0
+let R_in_buffer = 0
+let R_source = "/homes/olymp/dominik.otto/Software/tmux_split.vim"
+let R_applescript = 0
+" Rmd syntax highligh
+let rmd_syn_hl_chunk = 1
+let g:rout_follow_colorscheme = 1
+let g:Rout_more_colors = 1
+" vimdiff colors
+let g:DiffColors=100
+" R syntax check by syntastic plugin
+"let g:syntastic_enable_r_lintr_checker = 1
+"let g:syntastic_r_checkers = ['lintr']
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+"let g:syntastic_always_populate_loc_list = 0
+"let g:syntastic_auto_loc_list = 0
+"let g:syntastic_check_on_open = 0
+"let g:syntastic_check_on_w = 1
+"let g:syntastic_check_on_wq = 0
+"let g:syntastic_r_lintr_linters = "with_defaults(assignment_linter = NULL, absolute_paths_linter = NULL, camel_case_linter = NULL, multiple_dots_linter = NULL, object_usage_linter)"
+" ncm2
+"autocmd BufEnter * call ncm2#enable_for_buffer()

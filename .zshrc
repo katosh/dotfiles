@@ -165,6 +165,9 @@ alias gpu='git push'
 alias gpl='git pull'
 alias gme='git merge --no-commit'
 
+# ls aliases
+alias ls='ls -G'
+alias ll='ls -GlA'
 
 # my expand aliases
 globalias() {
