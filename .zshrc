@@ -262,13 +262,6 @@ alias f=fff
 alias pfeh='feh --magick-timeout 1'
 alias sfeh='feh --scale-down --auto-zoom'
 
-# ssh aliases
-alias Mi='ssh -X mi'
-alias Zedat='ssh -X zedat'
-alias Pi='ssh -X pi'
-alias Piw='ssh -X piw'
-alias Pii='ssh -X pii'
-
 # locate aliases
 alias lupdatedb="updatedb -o $HOME/.locate.db --require-visibility 0 \
     --prunefs 'rpc_pipefs cgroup proc ftpfs devfs tmpfs fuse.sshfs curlftpfs \
@@ -368,6 +361,76 @@ np(){
     printf '\033]2;%s\033\\' "$*"
 }
 np '' # clear pane name
+
+# lmod colors
+export LMOD_COLORIZE="YES"
+
+# feh
+alias fep="feh --magick-timeout 1"
+
+# R
+export R_DEFAULT_PACKAGES="datasets,utils,grDevices,graphics,stats,methods,colorout"
+alias R="R --no-save"
+
+# xpra
+#export DISPLAY=:64
+export XPRA_DEFAULT_VFB_RESOLUTION=1920x1080
+
+# slurm
+alias job_nodes='squeue -h -o '\''%B'\'' | sort | uniq -c | sort -g'
+alias nodes='sinfo -N -e -O "nodehost,gres,statecompact,cpus,socketcorethread,cpusstate,cpusload,memory,allocmem" |
+    awk  '\''{printf("%s\t%i\t%i\n", $0, $8-$9,gensub(/(.+)\/(.+)\/(.+)\/(.+)/, "\\2", 1))}'\'' |
+    awk '\''{if($11>0){printf("%s\t%i\n", $0, $10/$11)}else{print $0 "\tMEM/TH"}}'\'' |
+    uniq | column -t | alternateColor'
+alias sq='squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q" |
+    column -s";" -t | alternateColor'
+alias squ='squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q" -u dotto |
+    column -s";" -t | alternateColor'
+alias wsq="watch --color -tx zsh -c 'source $HOME/.alternateColors;
+    squeue -S S,-p -o \"%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q\" |
+    column -s\";\" -t | alternateColor'"
+alias sinf='sinfo -o "%N;%G;%t;%P;%D;%a;%c;%z;%C;%O;%m;%d;%w" |
+    sed "s/||/| |/g" | column -s";" -t | alternateColor'
+alias sp='sprio -o "%i;%u;%Y;%A;%F;%J;%P;%Q;%N" | sort -r |
+    column -s";" -t | alternateColor'
+alias sqsp='join -t ";" <(squeue -r -o "%A;%F" |
+    sed "s/^\([^;]*\);N\/A/\1;\1/g" | sort) \
+    <(sprio -o "%i;%Y;%A;%F;%J;%P;%Q;%N" | sort) |
+    cut -d ";" -f 2- | uniq | join -a1 -t ";" \
+    <(squeue -t PD -o "%F;%i;%P;%r;%j;%u;%a;%M;%l;%C;%m;%b;%q" |
+    sed "s/^N\/A;\([^;]*\)/\1;\1/g" | sort) - |
+    cut -d ";" -f 2- | sort -n -k13 -t ";" | column -s";" -t | alternateColor'
+alias pssqsp='join -t ";" <(squeue -r -o "%A;%F" |
+    sed "s/^\([^;]*\);N\/A/\1;\1/g" | sort) \
+    <(sprio -o "%i;%Y;%A;%F;%J;%P;%Q;%N" | sort) |
+    cut -d ";" -f 2- | uniq | join -a1 -t ";" \
+    <(squeue -t PD -o "%F;%i;%P;%r;%j;%u;%a;%M;%l;%C;%m;%b;%q" |
+    sed "s/^N\/A;\([^;]*\)/\1;\1/g" | sort) - |
+    cut -d ";" -f 2- | sort -t ";" -r -n -k 13,13 | column -s";" -t | alternateColor'
+alias sstates='sinfo -N -e -O "nodehost,statecompact" | uniq |
+    sed -e "s/^[^ ]*[ ]*//g" | sort | uniq -c'
+jobinf(){
+    sacct -p -o JobID,JobName,State,Submit,Start,End,NodeList,AllocCPUS,AveCPU,CPUTime,Elapsed,REQMEM,MaxRSS,ExitCode -j "$*" \
+    | sed "s/||/| |/g" | column -s '|' -t | alternateColor
+}
+stail() {
+    response="$(scontrol show job $1 2>&1)"
+    if [[ "$response" =~ "^slurm_load_jobs error*" ]]; then
+        print "$response"
+        return 1
+    fi
+    [[ "$response" =~ ' StdErr=([[:print:]]*).*StdIn' ]] && stderr="$match[1]"
+    [[ "$response" =~ ' StdOut=([[:print:]]*).*Power' ]] && stdout="$match[1]"
+    # replace slurm variables such as %N with * for globbing
+    stderr="${stderr//\%?/*}"
+    stdout="${stdout//\%?/*}"
+    if [[ "$stderr" != "$stdout" ]]; then
+        ( tail -f -n+1 $~stdout & tail -f -n+1 $~stderr 1>&2 )
+    else
+        tail -f -n+1 $~stdout
+    fi
+}
+
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
