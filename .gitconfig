@@ -1,6 +1,7 @@
 [user]
 	name = Dominik
-	email = dominik.otto@izi.fraunhofer.de
+	email = dotto@fredhutch.org
+	signingkey = 57208C7DFC10EAAD
 [core]
 	editor = nvim
 [push]
@@ -27,3 +28,27 @@
     prompt = false
 [diff "pdf"]
     command = diffpdf
+[diff "jupyternotebook"]
+	command = git-nbdiffdriver diff
+[merge "jupyternotebook"]
+	driver = git-nbmergedriver merge %O %A %B %L %P
+	name = jupyter notebook merge driver
+[difftool "nbdime"]
+	cmd = git-nbdifftool diff \"$LOCAL\" \"$REMOTE\" \"$BASE\"
+[difftool]
+	prompt = false
+[mergetool "nbdime"]
+	cmd = git-nbmergetool merge \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+[mergetool]
+	prompt = false
+[init]
+	defaultBranch = main
+[safe]
+	directory = /fh/fast/setty_m/user/bdury/CellDensities
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[commit]
+	gpgsign = false

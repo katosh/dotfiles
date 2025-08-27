@@ -220,8 +220,29 @@ let R_assign = 0
 let R_in_buffer = 0
 let R_source = "/home/dotto/.vim/tmux_split.vim"
 let R_applescript = 0
-let R_path = "/app/software/R/4.0.3-foss-2020b/bin"
-let R_app = "/app/software/R/4.0.3-foss-2020b/bin/R"
+
+let R_path = "/fh/fast/setty_m/user/dotto/mamba/envs/da2/bin"
+let R_app = "/fh/fast/setty_m/user/dotto/mamba/envs/da2/bin/R"
+" Function to get the current R executable path
+"function! GetRPath()
+"    let l:r_path = system('which R')
+"    return substitute(l:r_path, '\n', '', 'g')
+"endfunction
+"
+"" Function to extract the directory path from the full R path
+"function! GetRDir(r_full_path)
+"    return substitute(a:r_full_path, '/R$', '', '')
+"endfunction
+"
+"" Get the current R executable path
+"let R_app = GetRPath()
+"let R_path = GetRDir(R_app)
+"
+"if !exists('g:rplugin')
+"        let g:rplugin = {}
+"endif
+"let g:rplugin.nvimcom_bin_dir = GetRDir(R_app)
+
 let R_nvim_wd = 1
 " Rmd syntax highligh
 let rmd_syn_hl_chunk = 1
@@ -250,12 +271,15 @@ function! Clip()
   let encodedText=substitute(encodedText, "'", "'\\\\''", "g")
   let executeCmd="echo -n '".encodedText."' | base64 | tr -d '\\n'"
   let encodedText=system(executeCmd)
+  
   if $TMUX != ""
-    "tmux
-    let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;;'.encodedText.'\x1b\x1b\\\\\x1b\\" > /dev/tty'
+    " tmux passthrough for OSC 52 in mosh
+    let executeCmd='echo -en "\x1bPtmux;\x1b\x1b]52;c;'.encodedText.'\x07\x1b\\" > /dev/tty'
   else
-    let executeCmd='echo -en "\x1b]52;;'.encodedText.'\x1b\\" > /dev/tty'
+    " regular OSC 52 sequence
+    let executeCmd='echo -en "\x1b]52;c;'.encodedText.'\x07" > /dev/tty'
   endif
+  
   call system(executeCmd)
   redraw!
 endfunction

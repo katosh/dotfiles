@@ -7,6 +7,7 @@ unsetopt beep
 bindkey -v
 zstyle :compinstall filename '/Users/dominik/.zshrc'
 
+echo 1-$(date +"%Y-%m-%d_%H:%M:%S")-------------------------
 autoload -Uz compinit
 compinit
 
@@ -119,8 +120,34 @@ sfn(){
 }
 
 # memory usage by user in MB
-usermem(){
-    ps hax -o rss,user | awk '{a[$2]+=$1;}END{for(i in a)print i" "int(a[i]/1024+0.5);}' | sort -rnk2
+usermem () {
+    # Gather RSS memory (in KiB) and user from all processes
+    ps hax -o rss,user | \
+    
+    # Sum RSS memory per user and output: <user> <bytes>
+    awk '{
+        a[$2]+=$1;
+    } END {
+        for (i in a) {
+            bytes = a[i] * 1024;  # convert KiB to bytes
+            print i, bytes;
+        }
+    }' | \
+    
+    # Sort descending by total memory usage (in bytes)
+    sort -k2 -rn | \
+    
+    # Convert to human-readable sizes
+    awk '{
+        size = $2;
+        hum = "B";
+        split("K M G T", unit);
+        for (j=1; size>=1024 && j<=4; j++) {
+            size /= 1024;
+            hum = unit[j];
+        }
+        printf "%-10s %7.2f %sB\n", $1, size, hum;
+    }'
 }
 
 alternateColor() {
@@ -382,10 +409,69 @@ alias nodes='sinfo -N -e -O "nodehost,gres,statecompact,cpus,socketcorethread,cp
     awk  '\''{printf("%s\t%i\t%i\n", $0, $8-$9,gensub(/(.+)\/(.+)\/(.+)\/(.+)/, "\\2", 1))}'\'' |
     awk '\''{if($11>0){printf("%s\t%i\n", $0, $10/$11)}else{print $0 "\tMEM/TH"}}'\'' |
     uniq | column -t | alternateColor'
-alias sq='squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q" |
-    column -s";" -t | alternateColor'
-alias squ='squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q" -u dotto |
-    column -s";" -t | alternateColor'
+sq() {
+    squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q" $@ |
+        column -s";" -t | alternateColor
+}
+squ() {
+    squeue -u $USER -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q" $@ |
+        column -s";" -t | alternateColor
+}
+sqn() {
+	if [ -z "$1" ]; then
+        echo "Usage: sqn [ slurm node name ]"
+        return 1
+    fi
+    local node="$1"
+    shift # Remove the first argument so that any additional arguments can be passed to squeue
+    squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%V;%C;%m;%b;%p;%q@@@%n@@@" $@ |
+        awk -v pattern="@@@${node}@@@" 'NR == 1 || $0 ~ pattern' | 
+        sed 's/@@@.*@@@//g' | column -s";" -t | alternateColor
+}
+sqt() {
+    local num_lines
+
+    # Determine if the first argument is a number and greater than 0
+    if [[ $1 =~ '^[0-9]+$' && $1 -gt 0 ]]; then
+        num_lines=$1
+        shift # Safe to shift since we've confirmed there's a valid argument
+    else
+        num_lines=20 # Default to 20 lines if no (valid) argument is provided
+    fi
+
+    squeue -o "%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q;%Y" --sort=-p -t PENDING "$@" |
+        awk -F ';' '
+            NR==1 || 
+            /Priority/ ||
+            /Resources/' |
+        head -n $num_lines |
+        column -s";" -t | alternateColor
+}
+
+            #!/AssocGrp.*Limit/ && 
+            #!/Association.*Limit/ && 
+            #!/AssocMax.*Limit/ && 
+            #!/BadConstraints/ && 
+            #!/DependencyNeverSatisfied/ && 
+            #!/Partition.*Limit/ && 
+            #!/QOS.*Limit/ && 
+            #!/QOSUsageThreshold/ && 
+            #!/ReqNodeNotAvail/ && 
+            #!/Resources/ && 
+            #!/Priority/ && 
+            #!/InvalidAccount/ && 
+            #!/InvalidQOS/ && 
+            #!/JobHeld.*/ && 
+            #!/NodeDown/ && 
+            #!/PartitionDown/ && 
+            #!/PartitionInactive/ && 
+            #!/Dependency/ &&
+            #!/BeginTime/ &&
+            #!/JobArrayTaskLimit/ &&
+            #!/Nodes required for job are/ &&
+            #!/launch failed requeued held/ &&
+            #!/Reservation/' |
+
 alias wsq="watch --color -tx zsh -c 'source $HOME/.alternateColors;
     squeue -S S,-p -o \"%i;%P;%R;%j;%u;%a;%T;%M;%l;%C;%m;%b;%p;%q\" |
     column -s\";\" -t | alternateColor'"
@@ -414,23 +500,251 @@ jobinf(){
     | sed "s/||/| |/g" | column -s '|' -t | alternateColor
 }
 stail() {
-    response="$(scontrol show job $1 2>&1)"
-    if [[ "$response" =~ "^slurm_load_jobs error*" ]]; then
-        print "$response"
+    # Ensure a job ID is provided
+    if [[ -z "$1" ]]; then
+        echo "Usage: stail [ jobid ] "
         return 1
     fi
-    [[ "$response" =~ ' StdErr=([[:print:]]*).*StdIn' ]] && stderr="$match[1]"
-    [[ "$response" =~ ' StdOut=([[:print:]]*).*Power' ]] && stdout="$match[1]"
-    # replace slurm variables such as %N with * for globbing
-    stderr="${stderr//\%?/*}"
-    stdout="${stdout//\%?/*}"
+
+    # Retrieve job details
+    local response="$(scontrol show job $1 2>&1)"
+    
+    # Check for errors in response
+    if [[ "$response" == *"slurm_load_jobs error"* ]]; then
+        echo "$response"
+        return 1
+    fi
+
+    # Extract StdErr and StdOut paths
+    local stderr stdout
+    [[ "$response" =~ ' StdErr=([[:print:]]*)' ]] && stderr="${match[1]}"
+    [[ "$response" =~ ' StdOut=([[:print:]]*)' ]] && stdout="${match[1]}"
+
+    # Handle placeholder replacement
+    stderr=$(echo $stderr | sed 's/%[jNn]/\*/g')
+    stdout=$(echo $stdout | sed 's/%[jNn]/\*/g')
+
+    # Check if paths are valid and not empty
+    if [[ -z "$stderr" || -z "$stdout" ]]; then
+        echo "Error: Could not find log file paths."
+        return 1
+    fi
+
+    # Tail log files, handling cases where StdErr and StdOut are the same or different
     if [[ "$stderr" != "$stdout" ]]; then
+        echo "Tailing StdOut and StdErr:"
         ( tail -f -n+1 $~stdout & tail -f -n+1 $~stderr 1>&2 )
     else
+        echo "Tailing StdOut (also used for StdErr):"
         tail -f -n+1 $~stdout
     fi
 }
 
+count_files() {
+    local dir="${1:-.}"
+    local step="${2:-100}"  # default to printing every 100 files
+    local count=0
+
+    while IFS= read -r _; do
+        (( count++ ))
+        if (( count % step == 0 )); then
+            printf "\rFiles counted: %'d" "$count"
+        fi
+    done < <(find "$dir" -type f)
+    printf "\rFiles counted: %'d\n" "$count"
+}
+
+# quickly probe FS performance: seq. R/W + IOPS
+# quickly probe FS performance: seq. R/W + IOPS
+probe_io() {
+  local base=${1:-./ziotest}       # base name for test files
+  local speed_file="${base}.speed"
+  local iops_file="${base}.iops"
+  local speed_mb=${2:-1024}        # size for speed test (MB)
+  local iops_mb=${3:-128}          # size for IOPS test (MB)
+  local bs_iops=1                  # block size in KB for IOPS
+  local dev=$(df -P "$PWD" | awk 'NR==2{print $1}')
+  local dev_tag=${dev//[\/:]/_}
+  local hostname="$(hostname)"
+  local logs="$HOME/probe_io_reports"
+  local ts=$(date '+%Y-%m-%d_%H%M%S')
+  local report="$logs/probe_io_${ts}_${dev_tag}.txt"
+  mkdir -p "$logs"
+  
+  # Calculate blocks once
+  local blocks=$(( iops_mb*1024/bs_iops ))
+  
+  {
+    echo "Report time : $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Hostname    : $hostname"
+    echo "Directory   : $PWD"
+    echo "Device      : $dev"
+    echo
+    echo "=== FS Benchmark on $dev ==="
+    echo "-- Sequential speed test (bs=1 MB, total ${speed_mb} MB) --"
+    
+    # Sequential write test
+    dd if=/dev/zero of="$speed_file" bs=1M count=$speed_mb conv=fdatasync 2>&1 \
+      | awk -F', ' '/copied/ { printf "  Write speed: %s %s\n", $(NF-1), $NF }'
+    
+    # Sequential read test
+    dd if="$speed_file" of=/dev/null bs=1M count=$speed_mb 2>&1 \
+      | awk -F', ' '/copied/ { printf "  Read  speed: %s %s\n\n", $(NF-1), $NF }'
+    
+    echo "-- IOPS test (bs=${bs_iops} KB, total ${iops_mb} MB) --"
+    
+    # Write IOPS test - fixed to properly pass blocks variable to awk
+    dd if=/dev/zero of="$iops_file" bs=${bs_iops}K count=$blocks conv=fdatasync 2>&1 \
+      | awk -v bs=${bs_iops} -v blocks=$blocks -F', ' '/copied/ {
+            t = $3; sub(/ s$/,"",t);
+            iops = blocks / t;
+            printf "  Write time : %s s\n", t;
+            printf "  Write speed: %s\n", $4;
+            printf "  Write IOPS : %.0f ops/s\n\n", iops;
+        }'
+    
+    # Read IOPS test - fixed to properly pass blocks variable to awk
+    dd if="$iops_file" of=/dev/null bs=${bs_iops}K count=$blocks 2>&1 \
+      | awk -v bs=${bs_iops} -v blocks=$blocks -F', ' '/copied/ {
+            t = $3; sub(/ s$/,"",t);
+            iops = blocks / t;
+            printf "  Read  time : %s s\n", t;
+            printf "  Read  speed: %s\n", $4;
+            printf "  Read  IOPS : %.0f ops/s\n\n", iops;
+        }'
+    
+    # cleanup
+    rm -f "$speed_file" "$iops_file"
+    
+    # need iostat
+    command -v iostat &>/dev/null || { echo "iostat not found—install sysstat"; return 1; }
+    
+    echo "-- Instantaneous I/O stats (1 s sample) --"
+    iostat -x -m "$dev" 1 2 \
+      | awk -v D="$dev" '
+          $1==D {
+            c++
+            if (c==2) {
+              printf "  IOPS snapshot: read=%.0f, write=%.0f ops/s\n", $4, $5
+              printf "  Throughput   : read=%.1f MB/s, write=%.1f MB/s\n", $6, $7
+            }
+          }
+        '
+    } | tee "$report"
+    
+    echo "Report saved to $report"
+}
+
+# 1Password login
+
+alias oplogin='tmux set-environment OP_SESSION_5VUOZKL7NZH4HJIUT6M4AYJT7I $(op signin --raw)'
+
+# register kernel in conda env for jupyter
+alias make_kernel=python -m ipykernel install --user --name $CONDA_DEFAULT_ENV --display-name "$CONDA_DEFAULT_ENV"
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
+
+# log the login
+if [[ -n "$SSH_CLIENT" ]] && [[ -f $HOME/ssh_login_logger.sh ]]; then
+        "$HOME/ssh_login_logger.sh"
+fi
+
+# runtime of a task of a specific PID:
+pruntime() {
+  emulate -L zsh
+  set -o noglob
+
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: pruntime <PID>" >&2
+    return 2
+  fi
+
+  local pid="$1"
+
+  if [[ ! -r "/proc/${pid}/stat" ]]; then
+    echo "PID ${pid} not accessible (wrong user or it exited)" >&2
+    return 1
+  fi
+
+  # Boot time + ticks per second
+  local boot hertz ticks start now elapsed
+  boot=$(awk '/btime/ {print $2}' /proc/stat) || return 1
+  hertz=$(getconf CLK_TCK) || return 1
+  ticks=$(awk '{print $22}' "/proc/${pid}/stat") || return 1
+  start=$(( boot + ticks / hertz ))
+  now=$(date +%s)
+  elapsed=$(( now - start ))
+
+  local days=$((elapsed/86400))
+  local hh=$((elapsed%86400/3600))
+  local mm=$((elapsed%3600/60))
+  local ss=$((elapsed%60))
+
+  # Stat fields
+  local comm state utime stime vsize rss nice pri threads
+  read _ comm state _ _ _ _ _ _ _ _ utime stime _ _ _ _ _ nice pri _ _ vsize rss _ _ _ _ _ threads _ <"/proc/${pid}/stat"
+  comm=${comm//[()]/}
+
+  # CPU time
+  local cputime=$(((utime+stime)/hertz))
+  local cdays=$((cputime/86400))
+  local chh=$((cputime%86400/3600))
+  local cmm=$((cputime%3600/60))
+  local css=$((cputime%60))
+
+  # Human-readable memory
+  local pagesize=$(getconf PAGESIZE)
+  local rss_bytes=$((rss * pagesize))
+  local vsize_bytes=$vsize
+
+  hr_kib() {
+    # arg in kB (10^3 bytes), convert to KiB->MiB->GiB-ish display
+    local kb=$1
+    local kib=$(( kb * 1000 / 1024 ))  # approximate KiB; good enough for display
+    local units=(KiB MiB GiB TiB)
+    local i=0
+    local val=$kib
+    while (( val >= 1024 && i < ${#units[@]}-1 )); do
+      val=$(( val / 1024 ))
+      ((i++))
+    done
+    # print with one decimal – do simple fixed-point: val.x where x is next digit
+    local next=$(( (kib * 100 / (1024 ** i)) % 100 ))
+    printf "%d.%01d %s" "$val" $((next/10)) "${units[i]}"
+  }
+
+  local rss_h=$(hr_kib $rss_bytes)
+  local vsize_h=$(hr_kib $vsize_bytes)
+
+  # User & other info
+  local user=$(stat -c %U "/proc/${pid}")
+  local nfiles=$(ls -1 "/proc/${pid}/fd" 2>/dev/null | wc -l)
+  local cgroup=$(awk -F: '/memory/ {print $3}' "/proc/${pid}/cgroup" 2>/dev/null)
+
+  echo "PID:       $pid"
+  echo "User:      $user"
+  echo "Command:   $comm"
+  echo "State:     $state"
+  echo "Threads:   $threads"
+  echo "Nice/Pri:  $nice / $pri"
+  echo "Start:     $(date -d @${start})"
+  printf "Elapsed:   %d days %02d:%02d:%02d\n" $days $hh $mm $ss
+  printf "CPU time:  %d days %02d:%02d:%02d\n" $cdays $chh $cmm $css
+  echo "Memory:    RSS=$rss_h VSZ=$vsize_h"
+  echo "Open FDs:  $nfiles"
+  [[ -n $cgroup ]] && echo "CGroup:    $cgroup"
+
+  # Slurm hook
+  if command -v scontrol >/dev/null 2>&1; then
+    local jobid
+    jobid=$(scontrol pidinfo "$pid" 2>/dev/null | awk -F= '/JobId/ {print $2}' | xargs)
+    if [[ -n "$jobid" ]]; then
+      echo "--- Slurm ---"
+      echo "JobId:    $jobid"
+      if command -v sacct >/dev/null 2>&1; then
+        sacct -j "$jobid" --format=JobID,User,State,Start,Elapsed,End | sed 's/^/  /'
+      fi
+    fi
+  fi
+}
