@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# CLI wrapper for proxy-fetch — fetches URLs through the SOCKS proxy.
+# Uses curl (system SSL, no Python cert issues) with html-to-text via sed.
+#
+# Usage:
+#   proxy-fetch <url>              Fetch URL, convert HTML to text
+#   proxy-fetch --raw <url>        Fetch URL, return raw HTML
+#   proxy-fetch --pdf <url> [path] Download PDF to path (default: /tmp/fetched.pdf)
+#   proxy-fetch --check            Check if SOCKS proxy is reachable
+
+set -euo pipefail
+
+PROXY="${SOCKS_PROXY:-socks5://localhost:1080}"
+# Extract host:port from socks5://host:port
+PROXY_HP="${PROXY#socks5://}"
+PROXY_HP="${PROXY_HP#socks5h://}"
+UA="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+TIMEOUT=30
+
+html_to_text() {
+    sed -E '
+        # Remove script/style blocks (single-line approximation)
+        s/<script[^>]*>.*<\/script>//gI
+        s/<style[^>]*>.*<\/style>//gI
+        # Convert line breaks and paragraphs
+        s/<br[[:space:]]*\/?[[:space:]]*>/\n/gI
+        s/<\/?p[^>]*>/\n\n/gI
+        # Headers
+        s/<h[1-6][^>]*>/\n\n## /gI
+        s/<\/h[1-6]>/\n\n/gI
+        # List items
+        s/<li[^>]*>/\n- /gI
+        s/<\/li>//gI
+        # Strip remaining tags
+        s/<[^>]*>//g
+        # Decode common entities
+        s/&amp;/\&/g
+        s/&lt;/</g
+        s/&gt;/>/g
+        s/&quot;/"/g
+        s/&#39;/'"'"'/g
+        s/&nbsp;/ /g
+    ' | sed '/^$/N;/^\n$/d'
+}
+
+ensure_https() {
+    local url="$1"
+    case "$url" in
+        http://*|https://*) echo "$url" ;;
+        *) echo "https://$url" ;;
+    esac
+}
+
+case "${1:-}" in
+    --check)
+        result=$(curl --socks5-hostname "$PROXY_HP" -s -m 10 \
+            "https://httpbin.org/ip" 2>&1) || {
+            echo "Proxy UNREACHABLE at $PROXY"
+            echo "Is your SSH tunnel running?"
+            exit 1
+        }
+        ip=$(echo "$result" | grep -o '"origin"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
+        echo "Proxy OK. External IP: ${ip:-unknown}"
+        echo "Proxy: $PROXY"
+        ;;
+    --pdf)
+        url=$(ensure_https "${2:?Usage: proxy-fetch --pdf <url> [save_path]}")
+        save_path="${3:-/tmp/fetched.pdf}"
+        http_code=$(curl --socks5-hostname "$PROXY_HP" -s -m 60 -L \
+            -A "$UA" -H "Accept: application/pdf,*/*" \
+            -o "$save_path" -w "%{http_code}" \
+            "$url" 2>&1)
+        if [[ "$http_code" -ge 400 ]]; then
+            echo "HTTP $http_code fetching $url"
+            rm -f "$save_path"
+            exit 1
+        fi
+        size=$(wc -c < "$save_path" | tr -d ' ')
+        echo "Saved $size bytes to $save_path"
+        ;;
+    --raw)
+        url=$(ensure_https "${2:?Usage: proxy-fetch --raw <url>}")
+        curl --socks5-hostname "$PROXY_HP" -s -m "$TIMEOUT" -L \
+            -A "$UA" -H "Accept: text/html,*/*" \
+            -f "$url"
+        ;;
+    --help|-h|"")
+        echo "Usage: proxy-fetch [--raw|--pdf|--check] <url> [save_path]"
+        echo ""
+        echo "  proxy-fetch <url>              Fetch URL, convert HTML to text"
+        echo "  proxy-fetch --raw <url>        Fetch URL, return raw HTML"
+        echo "  proxy-fetch --pdf <url> [path] Download PDF (default: /tmp/fetched.pdf)"
+        echo "  proxy-fetch --check            Check SOCKS proxy connectivity"
+        ;;
+    *)
+        url=$(ensure_https "$1")
+        curl --socks5-hostname "$PROXY_HP" -s -m "$TIMEOUT" -L \
+            -A "$UA" -H "Accept: text/html,application/xhtml+xml,*/*" \
+            -f "$url" | html_to_text
+        ;;
+esac

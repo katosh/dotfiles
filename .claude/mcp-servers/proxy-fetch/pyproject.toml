@@ -1,0 +1,12 @@
+[project]
+name = "proxy-fetch"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.0.0",
+    "httpx[socks]>=0.27.0",
+    "truststore>=0.10.4",
+]
+
+[project.scripts]
+proxy-fetch = "server:mcp.run"

@@ -1,0 +1,83 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__proxy-fetch__fetch",
+      "mcp__proxy-fetch__fetch_pdf",
+      "mcp__proxy-fetch__check_proxy"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/hooks/statusline.sh"
+  },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true
+  },
+  "alwaysThinkingEnabled": true,
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmux claude-hook session-start 2>/dev/null; cmux set-status claude-session 'Active' --icon '🟢' 2>/dev/null; cmux clear-status claude-notification 2>/dev/null; exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); active=$(echo \"$input\" | jq -r '.stop_hook_active // false'); if [ \"$active\" = \"true\" ]; then exit 0; fi; cmux claude-hook stop 2>/dev/null; cmux set-status claude-session 'Idle' --icon '⏸' 2>/dev/null; cmux clear-status claude-notification 2>/dev/null; cmux clear-progress 2>/dev/null; exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); ntype=$(echo \"$input\" | jq -r '.notification_type // \"unknown\"'); cmux notify --title 'Claude Code' --body \"$ntype\" 2>/dev/null; cmux set-status claude-notification \"$ntype\" --icon '⚠️' 2>/dev/null; exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); agent_type=$(echo \"$input\" | jq -r '.agent_type // \"agent\"'); cmux set-status claude-subagent \"$agent_type\" --icon '🔄' 2>/dev/null; exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmux clear-status claude-subagent 2>/dev/null; exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

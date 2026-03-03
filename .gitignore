@@ -7,3 +7,27 @@
 .vim/.netrwhist
 
 .vim/
+
+# Claude Code auto-generated (never track)
+.claude/__store.db
+.claude/history.jsonl
+.claude/debug/
+.claude/cache/
+.claude/backups/
+.claude/paste-cache/
+.claude/file-history/
+.claude/plugins/
+.claude/plans/
+.claude/projects/
+.claude/session-env/
+.claude/shell-snapshots/
+.claude/statsig/
+.claude/tasks/
+.claude/teams/
+.claude/telemetry/
+.claude/todos/
+.claude/stats-cache.json
+.claude/mcp-needs-auth-cache.json
+.claude/settings.json.bak
+.claude/mcp-servers/*/.venv/
+.claude/mcp-servers/*/uv.lock

@@ -1,0 +1,460 @@
+#!/bin/bash
+# tmux-cmux-shim — Translates tmux CLI calls from Claude Code into cmux API calls.
+#
+# Place this ahead of the real tmux in PATH and set TMUX=cmux-shim so
+# Claude Code's agent-teams backend thinks it's running inside tmux.
+#
+# Supported commands (the subset Claude Code actually uses):
+#   has-session -t <name>
+#   new-session -d -s <name>
+#   new-window  -t <session> -n <name> -P -F "#{pane_id}"
+#   split-window -h [-t <target>] [-P -F "#{pane_id}"]
+#   send-keys -t <target> <text...> [Enter]
+#   kill-pane -t <paneId>
+#   list-panes [-t <target>] [-F <format>]
+#   select-pane -t <paneId> -T <title>
+#   set-option / set -g <option> <value>
+#   capture-pane -t <pane> -p [-S <start>]
+#   display-message -p <format>
+#   select-layout [-t <target>] <layout>
+#   resize-pane [-t <target>] [-x <w>] [-y <h>] [-LRUD <amt>]
+#
+# Unsupported commands are logged and silently succeed.
+
+set -euo pipefail
+
+LOG="/tmp/cmux-tmux-shim.log"
+
+# Scope state per workspace so parallel sessions don't conflict.
+# CMUX_WORKSPACE_ID is set by cmux in every terminal and is unique per workspace.
+_ws="${CMUX_WORKSPACE_ID:-default}"
+PANE_MAP="/tmp/cmux-tmux-shim-panes/$_ws"
+AGENTS_PANE_FILE="$PANE_MAP/.agents-pane"
+LEADER_SURFACE_FILE="$PANE_MAP/.leader-surface"
+mkdir -p "$PANE_MAP"
+
+log() { echo "[$(date +%H:%M:%S)] [$_ws] $*" >> "$LOG"; }
+
+# Get the leader (main Claude Code) surface ref.
+# Stored on first call so that splits always happen off the main panel,
+# regardless of which surface's context invokes the shim later.
+get_leader_surface() {
+    if [[ -f "$LEADER_SURFACE_FILE" ]]; then
+        local cached
+        cached=$(cat "$LEADER_SURFACE_FILE")
+        # Validate the cached surface still exists.
+        if cmux list-panels 2>/dev/null | grep -q "$cached"; then
+            echo "$cached"
+            return 0
+        fi
+        log "get_leader_surface: cached $cached is stale, re-resolving"
+        rm -f "$LEADER_SURFACE_FILE"
+    fi
+    # Resolve caller's surface to a short ref via identify.
+    local ref
+    ref=$(cmux identify 2>/dev/null | grep -oE '"surface_ref" *: *"surface:[0-9]+"' | head -1 | grep -oE 'surface:[0-9]+') || true
+    if [[ -n "$ref" ]]; then
+        echo "$ref" > "$LEADER_SURFACE_FILE"
+        log "get_leader_surface: stored $ref"
+        echo "$ref"
+    else
+        log "get_leader_surface: WARNING could not determine leader surface"
+        echo ""
+    fi
+}
+
+# Create a surface for an agent teammate.
+# First call: splits right from the leader surface to create a dedicated agents pane.
+# Subsequent calls: adds a tab in that pane.
+create_agent_surface() {
+    local name="${1:-teammate}"
+
+    if [[ -f "$AGENTS_PANE_FILE" ]]; then
+        local agents_pane
+        agents_pane=$(cat "$AGENTS_PANE_FILE")
+        # Verify the pane still exists.
+        if cmux list-panes 2>/dev/null | grep -q "$agents_pane"; then
+            # Add a tab in the existing agents pane.
+            local out
+            out=$(cmux new-surface --pane "$agents_pane" 2>&1) || { log "new-surface failed: $out"; exit 1; }
+            local surface_ref
+            surface_ref=$(echo "$out" | grep -oE 'surface:[0-9]+')
+            cmux rename-tab --surface "$surface_ref" "$name" >/dev/null 2>&1 || true
+            log "create_agent_surface: added tab $surface_ref in $agents_pane (name=$name)"
+            echo "$surface_ref"
+            return 0
+        else
+            log "create_agent_surface: agents pane $agents_pane gone, will re-create"
+            rm -f "$AGENTS_PANE_FILE"
+        fi
+    fi
+
+    # First agent: split right from the leader surface to create a new pane.
+    local leader
+    leader=$(get_leader_surface)
+    local out
+    if [[ -n "$leader" ]]; then
+        out=$(cmux new-split right --surface "$leader" 2>&1) || { log "new-split failed: $out"; exit 1; }
+    else
+        out=$(cmux new-split right 2>&1) || { log "new-split failed: $out"; exit 1; }
+    fi
+    local surface_ref
+    surface_ref=$(echo "$out" | grep -oE 'surface:[0-9]+')
+    cmux rename-tab --surface "$surface_ref" "$name" >/dev/null 2>&1 || true
+
+    # Discover which pane this surface belongs to.
+    # identify --surface returns caller.pane_ref for the queried surface,
+    # but JSON key order is non-deterministic, so extract from the "caller" block.
+    local pane_ref=""
+    local pane_candidate
+    for pane_candidate in $(cmux list-panes 2>/dev/null | grep -oE 'pane:[0-9]+'); do
+        if cmux list-pane-surfaces --pane "$pane_candidate" 2>/dev/null | grep -q "$surface_ref"; then
+            pane_ref="$pane_candidate"
+            break
+        fi
+    done
+    if [[ -n "$pane_ref" ]]; then
+        echo "$pane_ref" > "$AGENTS_PANE_FILE"
+        log "create_agent_surface: created agents pane $pane_ref with $surface_ref (name=$name)"
+    else
+        log "create_agent_surface: WARNING could not determine pane for $surface_ref"
+    fi
+
+    echo "$surface_ref"
+}
+
+# Parse a target like "session:window" or "%N" into a cmux surface ref.
+# We store a mapping from tmux pane IDs (%N) to cmux surface refs.
+resolve_target() {
+    local target="$1"
+    # If it's a %N pane id, look up our mapping.
+    if [[ "$target" == %* ]]; then
+        local map_file="$PANE_MAP/$target"
+        if [[ -f "$map_file" ]]; then
+            cat "$map_file"
+            return 0
+        fi
+    fi
+    # If it's a session:window format, look up by window name.
+    if [[ "$target" == *:* ]]; then
+        local window_name="${target##*:}"
+        local map_file="$PANE_MAP/window-$window_name"
+        if [[ -f "$map_file" ]]; then
+            cat "$map_file"
+            return 0
+        fi
+    fi
+    # Fallback: return the target as-is (might be a cmux ref already).
+    echo "$target"
+}
+
+# Allocate a fake tmux pane ID and map it to a cmux surface ref.
+next_pane_id() {
+    local counter_file="$PANE_MAP/.counter"
+    local n=0
+    [[ -f "$counter_file" ]] && n=$(cat "$counter_file")
+    n=$((n + 1))
+    echo "$n" > "$counter_file"
+    echo "%$n"
+}
+
+register_pane() {
+    local pane_id="$1"
+    local surface_ref="$2"
+    echo "$surface_ref" > "$PANE_MAP/$pane_id"
+    log "Registered $pane_id -> $surface_ref"
+}
+
+cmd="$1"
+shift || true
+log "tmux $cmd $*"
+
+case "$cmd" in
+    has-session)
+        # Claude checks if a session exists. We always say yes for "claude-agents".
+        # Parse -t <name>
+        session=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) session="$2"; shift 2 ;;
+                *) shift ;;
+            esac
+        done
+        log "has-session: $session -> OK (cmux is always available)"
+        exit 0
+        ;;
+
+    new-session)
+        # Claude creates a tmux session. We're already in cmux, so this is a no-op.
+        log "new-session: no-op (cmux is the session)"
+        exit 0
+        ;;
+
+    new-window)
+        # Claude creates a new window for a teammate.
+        # Parse: -t <session> -n <name> -P -F "#{pane_id}"
+        session="" name="" print_pane=false
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) session="$2"; shift 2 ;;
+                -n) name="$2"; shift 2 ;;
+                -P) print_pane=true; shift ;;
+                -F) shift 2 ;;  # skip format string
+                *) shift ;;
+            esac
+        done
+
+        # Create a surface in the agents pane (split on first, tab on subsequent).
+        surface_ref=$(create_agent_surface "${name:-teammate}")
+
+        # Allocate a pane ID and register.
+        pane_id=$(next_pane_id)
+        register_pane "$pane_id" "$surface_ref"
+        [[ -n "$name" ]] && echo "$surface_ref" > "$PANE_MAP/window-$name"
+
+        if $print_pane; then
+            echo "$pane_id"
+        fi
+        log "new-window: created $surface_ref as $pane_id (name=$name)"
+        ;;
+
+    split-window|splitw)
+        # Claude splits a pane for a teammate.
+        # Parse: [-h|-v] [-t <target>] [-P] [-F <format>]
+        target="" print_pane=false direction="right"
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -h) direction="right"; shift ;;
+                -v) direction="down"; shift ;;
+                -t) target="$2"; shift 2 ;;
+                -P) print_pane=true; shift ;;
+                -F) shift 2 ;;
+                *) shift ;;
+            esac
+        done
+
+        # Create a surface in the agents pane (split on first, tab on subsequent).
+        surface_ref=$(create_agent_surface "teammate")
+
+        pane_id=$(next_pane_id)
+        register_pane "$pane_id" "$surface_ref"
+
+        if $print_pane; then
+            echo "$pane_id"
+        fi
+        log "split-window: created $surface_ref as $pane_id"
+        ;;
+
+    send-keys|send)
+        # Claude sends a command to a pane.
+        # Parse: [-t <target>] <text...> [Enter]
+        target="" texts=()
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) target="$2"; shift 2 ;;
+                -l) shift ;;  # literal flag, ignore
+                *) texts+=("$1"); shift ;;
+            esac
+        done
+
+        surface_ref=""
+        if [[ -n "$target" ]]; then
+            surface_ref=$(resolve_target "$target")
+        fi
+
+        # Check if the last argument is "Enter" — if so, send text then press enter.
+        send_enter=false
+        last_idx=$(( ${#texts[@]} - 1 ))
+        if [[ ${#texts[@]} -gt 0 && "${texts[$last_idx]}" == "Enter" ]]; then
+            send_enter=true
+            unset "texts[$last_idx]"
+        fi
+
+        text="${texts[*]}"
+
+        if [[ -n "$surface_ref" && "$surface_ref" == surface:* ]]; then
+            [[ -n "$text" ]] && cmux send --surface "$surface_ref" "$text" >/dev/null 2>&1 || true
+            $send_enter && cmux send-key --surface "$surface_ref" Enter >/dev/null 2>&1 || true
+        else
+            [[ -n "$text" ]] && cmux send "$text" >/dev/null 2>&1 || true
+            $send_enter && cmux send-key Enter >/dev/null 2>&1 || true
+        fi
+        log "send-keys: target=$target surface=$surface_ref text='${text:0:80}...' enter=$send_enter"
+        ;;
+
+    kill-pane)
+        # Claude kills a teammate pane on abort.
+        target=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) target="$2"; shift 2 ;;
+                *) shift ;;
+            esac
+        done
+        if [[ -n "$target" ]]; then
+            surface_ref=$(resolve_target "$target")
+            if [[ "$surface_ref" == surface:* ]]; then
+                cmux close-surface --surface "$surface_ref" >/dev/null 2>&1 || true
+                rm -f "$PANE_MAP/$target" 2>/dev/null
+            fi
+            # If the agents pane has no surfaces left, clean up the tracker.
+            if [[ -f "$AGENTS_PANE_FILE" ]]; then
+                _agents_pane=$(cat "$AGENTS_PANE_FILE")
+                if ! cmux list-panes 2>/dev/null | grep -q "$_agents_pane"; then
+                    rm -f "$AGENTS_PANE_FILE"
+                    log "kill-pane: agents pane $_agents_pane gone, cleared tracker"
+                fi
+            fi
+        fi
+        log "kill-pane: target=$target surface=$surface_ref"
+        ;;
+
+    list-panes)
+        # Claude may list panes to check status.
+        cmux list-panels 2>/dev/null | while read -r line; do
+            if echo "$line" | grep -q 'surface:'; then
+                ref=$(echo "$line" | grep -oE 'surface:[0-9]+')
+                echo "$ref"
+            fi
+        done
+        ;;
+
+    select-pane)
+        # Claude sets pane title for border status.
+        target="" title=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) target="$2"; shift 2 ;;
+                -T) title="$2"; shift 2 ;;
+                *) shift ;;
+            esac
+        done
+        if [[ -n "$target" && -n "$title" ]]; then
+            surface_ref=$(resolve_target "$target")
+            if [[ "$surface_ref" == surface:* ]]; then
+                cmux rename-tab --surface "$surface_ref" "$title" >/dev/null 2>&1 || true
+            fi
+        fi
+        log "select-pane: target=$target title=$title"
+        ;;
+
+    set|set-option)
+        # Claude enables pane-border-status. No-op in cmux.
+        log "set-option: no-op ($*)"
+        ;;
+
+    capture-pane)
+        # Claude reads pane content to verify startup.
+        target="" print=false start=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) target="$2"; shift 2 ;;
+                -p) print=true; shift ;;
+                -S) start="$2"; shift 2 ;;
+                *) shift ;;
+            esac
+        done
+        if [[ -n "$target" ]] && $print; then
+            surface_ref=$(resolve_target "$target")
+            if [[ "$surface_ref" == surface:* ]]; then
+                cmux read-screen --surface "$surface_ref" --lines 50 2>/dev/null || true
+            fi
+        fi
+        log "capture-pane: target=$target"
+        ;;
+
+    display-message|display)
+        # Claude Code queries current pane/session info.
+        # Parse: [-p] [-t <target>] <format>
+        print_stdout=false
+        format=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -p) print_stdout=true; shift ;;
+                -t) shift; shift ;;  # ignore target
+                *)  format="$1"; shift ;;
+            esac
+        done
+
+        # Return a fake current pane ID for the main Claude process.
+        # Ensure %0 is registered as the "main" pane, and seed the leader surface.
+        if [[ ! -f "$PANE_MAP/%0" ]]; then
+            current_surface="${CMUX_SURFACE_ID:-surface:0}"
+            register_pane "%0" "$current_surface"
+            # Also seed the leader surface (resolve UUID to short ref if needed).
+            get_leader_surface >/dev/null 2>&1
+        fi
+
+        result=""
+        case "$format" in
+            '#{pane_id}')
+                result="%0"
+                ;;
+            '#{session_name}:#{window_index}')
+                result="claude-agents:0"
+                ;;
+            '#{session_name}')
+                result="claude-agents"
+                ;;
+            '#{window_index}')
+                result="0"
+                ;;
+            *)
+                result="claude-agents"
+                ;;
+        esac
+
+        if $print_stdout; then
+            echo "$result"
+        fi
+        log "display-message: format=$format -> $result"
+        ;;
+
+    select-layout)
+        # Claude sets layout (e.g. main-vertical: leader left, teammates stacked right).
+        # cmux has no layout presets — pane arrangement is determined by split order.
+        # Parse: [-t <target>] <layout-name>
+        target="" layout=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) target="$2"; shift 2 ;;
+                *)  layout="$1"; shift ;;
+            esac
+        done
+        log "select-layout: $layout (no-op, cmux uses split-order layout)"
+        ;;
+
+    resize-pane|resizep)
+        # Claude resizes panes (e.g. leader to 30%, teammates get 70%).
+        # Parse: [-t <target>] [-x <width>] [-y <height>] [-L|-R|-U|-D <amount>]
+        target="" width="" height="" direction="" amount=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                -t) target="$2"; shift 2 ;;
+                -x) width="$2"; shift 2 ;;
+                -y) height="$2"; shift 2 ;;
+                -L) direction="-L"; shift ;;
+                -R) direction="-R"; shift ;;
+                -U) direction="-U"; shift ;;
+                -D) direction="-D"; shift ;;
+                -Z) shift ;;  # zoom toggle, ignore
+                *)  amount="$1"; shift ;;
+            esac
+        done
+
+        if [[ -n "$target" ]]; then
+            surface_ref=$(resolve_target "$target")
+            # cmux resize-pane uses -L/-R/-U/-D with --amount (not percentage).
+            # Attempt the call — cmux will return not_supported until implemented.
+            if [[ -n "$direction" && "$surface_ref" == surface:* ]]; then
+                cmux resize-pane --pane "$surface_ref" "$direction" --amount "${amount:-10}" >/dev/null 2>&1 || true
+            fi
+        fi
+        log "resize-pane: target=$target width=$width height=$height dir=$direction amount=$amount"
+        ;;
+
+    *)
+        log "UNSUPPORTED: tmux $cmd $*"
+        # Silently succeed for unknown commands.
+        ;;
+esac
