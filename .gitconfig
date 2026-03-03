@@ -45,6 +45,7 @@
 	defaultBranch = main
 [safe]
 	directory = /fh/fast/setty_m/user/bdury/CellDensities
+	directory = /fh/fast/setty_m/user/sbaasri/annzarro
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process

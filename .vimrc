@@ -9,7 +9,6 @@ call plug#begin('~/.vim/plugged')
 
 "Plug 'Vim-R-plugin'
 "Plug 'jalvesaq/R-Vim-runtime'
-Plug 'jalvesaq/Nvim-R'
 Plug 'jalvesaq/Nvim-R', {'branch': 'stable'}
 "Plug 'screen.vim'
 "Plug 'vim-pandoc/vim-rmarkdown'
@@ -128,8 +127,6 @@ if &t_Co > 2 || has("gui_running")
 endif
 
 " show trailing white space and overlength (80 char)
-"highlight undesiredChars ctermbg=red ctermfg=white guibg=red
-"match undesiredChars /\s\+$\|\%81v.\+/
 set colorcolumn=80
 
 " alias to delete trailing white spaces
@@ -218,30 +215,11 @@ let g:R_tmux_title = ""
 " dont replace '_' by ' <- '
 let R_assign = 0
 let R_in_buffer = 0
-let R_source = "/home/dotto/.vim/tmux_split.vim"
+let R_source = "/homes/olymp/dominik.otto/Software/tmux_split.vim"
 let R_applescript = 0
 
 let R_path = "/fh/fast/setty_m/user/dotto/mamba/envs/da2/bin"
 let R_app = "/fh/fast/setty_m/user/dotto/mamba/envs/da2/bin/R"
-" Function to get the current R executable path
-"function! GetRPath()
-"    let l:r_path = system('which R')
-"    return substitute(l:r_path, '\n', '', 'g')
-"endfunction
-"
-"" Function to extract the directory path from the full R path
-"function! GetRDir(r_full_path)
-"    return substitute(a:r_full_path, '/R$', '', '')
-"endfunction
-"
-"" Get the current R executable path
-"let R_app = GetRPath()
-"let R_path = GetRDir(R_app)
-"
-"if !exists('g:rplugin')
-"        let g:rplugin = {}
-"endif
-"let g:rplugin.nvimcom_bin_dir = GetRDir(R_app)
 
 let R_nvim_wd = 1
 " Rmd syntax highligh
@@ -264,7 +242,6 @@ let g:DiffColors=100
 "let g:syntastic_r_lintr_linters = "with_defaults(assignment_linter = NULL, absolute_paths_linter = NULL, camel_case_linter = NULL, multiple_dots_linter = NULL, object_usage_linter)"
 " ncm2
 "autocmd BufEnter * call ncm2#enable_for_buffer()
-
 function! Clip()
   let encodedText=@"
   let encodedText=substitute(encodedText, '\', '\\\\', "g")

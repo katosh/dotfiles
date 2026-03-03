@@ -59,6 +59,90 @@ setopt share_history
 setopt hist_reduce_blanks
 setopt hist_ignore_all_dups
 
+# autocorrection for commands on return
+setopt correct
+
+# for fast renaming with regular expressions
+autoload -U zmv
+
+# python config with autocompletion
+#export PYTHONSTARTUP="$HOME/.pythonrc"
+# python site packages
+#export PYTHONPATH=/usr/local/Cellar/opencv/2.4.11_1/lib/python2.7/site-packages
+#export PATH=$PATH:/Users/dominik/Library/Python/3.7/bin
+
+## keybindings
+bindkey "^[[A"  history-beginning-search-backward
+bindkey "^[[B"  history-beginning-search-forward
+
+export EDITOR="/usr/local/bin/vim"
+
+# mutt emaul client
+export MUTT_EMAIL_ADDRESS="dominik.otto@gmail.com"
+export MUTT_REALNAME="Dominik Otto"
+export MUTT_SMTP_URL="smtp://dominik.otto@smtp.gmail.com:587/"
+
+
+# add local configurations
+if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
+
+## some automations
+# vim open filetype in taps
+vto() {
+    vim -p *.$1
+}
+
+# sum disc usage of all files/directorys that fit the name pattern
+sfn(){
+    find . -name "$*" -print0 | du --files0-from=- -hc | tail -n1
+}
+
+# display csv
+dcsv(){
+    cat $* | sed -e 's/,,/, ,/g' | column -s";" -t | less -N -S
+}
+dccsv(){
+    cat $* | column -s"," -t | less -N -S
+}
+dtab(){
+    cat $* | column -t | less -N -S
+}
+stdl(){
+    ssh dominik@ottoslink.de "wget -O - ${1}" >> ${1##*/}
+}
+p(){
+    if [[ -d "$1" ]]; then
+        (cd "$1"; pwd -P)
+    else
+        (cd $(dirname "$1"); echo "$(pwd -P)/$(basename "$1")")
+    fi
+}
+
+# use oh-my-zsh if exists
+# to install: sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+if [ -f $HOME/.oh-my-zsh/oh-my-zsh.sh ]; then
+    export ZSH=$HOME/.oh-my-zsh
+    ZSH_THEME="robbyrussell"
+    plugins=(git tmux)
+    source $ZSH/oh-my-zsh.sh
+fi
+
+## Aliases
+
+if command -v matlab >/dev/null 2>&1; then
+    alias matl='matlab -nodesktop -nosplash'
+fi
+alias initRM="/bin/ls > README"
+alias c='rsync -ah --progress'
+
+# aliases for most used calls
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -g g='| grep -i'
+alias v='vim'
+alias sv='sudo vim'
+
 # tmux 256 color support
 alias tmux="tmux -2"
 
@@ -98,13 +182,12 @@ alias ag='sudo apt-get'
 alias ac='apt-cache'
 alias ap='sudo aptitude'
 
-# enable color support of ls
-if [ "$TERM" != "dumb" ]; then
-        alias ls='ls --color=always'
-        eval $(dircolors ~/.dircolors)
-fi
 #LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
 export LS_COLORS
+
+# language settings
+export LANG=en_US.utf8
+export LC_ALL=en_US.utf8
 
 # Tockens
 if [ -f $HOME/.tokens ]; then source $HOME/.tokens; fi
@@ -273,6 +356,10 @@ alias gpu='git push'
 alias gpl='git pull'
 alias gme='git merge --no-commit'
 
+# ls aliases
+alias ls='ls -G'
+alias ll='ls -GlA'
+
 # aliases for most used calls
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -299,15 +386,6 @@ alias llocate="locate --database=$HOME/.locate.db"
 
 # favorit rsync
 alias c='rsync -ah --progress'
-
-alias la='ls -a'
-alias ll='ls -lA'          # ohne . und ..
-alias llh='ls -lh'
-
-# bitly alias
-if [ -f $HOME/Scripts/bitly.py ]; then
-    alias bitly='$HOME/Scripts/bitly.py'
-fi
 
 # matlab alias
 if command -v matlab >/dev/null 2>&1; then
@@ -391,9 +469,6 @@ np '' # clear pane name
 
 # lmod colors
 export LMOD_COLORIZE="YES"
-
-# feh
-alias fep="feh --magick-timeout 1"
 
 # R
 export R_DEFAULT_PACKAGES="datasets,utils,grDevices,graphics,stats,methods,colorout"
@@ -555,7 +630,6 @@ count_files() {
 }
 
 # quickly probe FS performance: seq. R/W + IOPS
-# quickly probe FS performance: seq. R/W + IOPS
 probe_io() {
   local base=${1:-./ziotest}       # base name for test files
   local speed_file="${base}.speed"
@@ -570,10 +644,10 @@ probe_io() {
   local ts=$(date '+%Y-%m-%d_%H%M%S')
   local report="$logs/probe_io_${ts}_${dev_tag}.txt"
   mkdir -p "$logs"
-  
+
   # Calculate blocks once
   local blocks=$(( iops_mb*1024/bs_iops ))
-  
+
   {
     echo "Report time : $(date '+%Y-%m-%d %H:%M:%S')"
     echo "Hostname    : $hostname"
@@ -582,17 +656,17 @@ probe_io() {
     echo
     echo "=== FS Benchmark on $dev ==="
     echo "-- Sequential speed test (bs=1 MB, total ${speed_mb} MB) --"
-    
+
     # Sequential write test
     dd if=/dev/zero of="$speed_file" bs=1M count=$speed_mb conv=fdatasync 2>&1 \
       | awk -F', ' '/copied/ { printf "  Write speed: %s %s\n", $(NF-1), $NF }'
-    
+
     # Sequential read test
     dd if="$speed_file" of=/dev/null bs=1M count=$speed_mb 2>&1 \
       | awk -F', ' '/copied/ { printf "  Read  speed: %s %s\n\n", $(NF-1), $NF }'
-    
+
     echo "-- IOPS test (bs=${bs_iops} KB, total ${iops_mb} MB) --"
-    
+
     # Write IOPS test - fixed to properly pass blocks variable to awk
     dd if=/dev/zero of="$iops_file" bs=${bs_iops}K count=$blocks conv=fdatasync 2>&1 \
       | awk -v bs=${bs_iops} -v blocks=$blocks -F', ' '/copied/ {
@@ -602,7 +676,7 @@ probe_io() {
             printf "  Write speed: %s\n", $4;
             printf "  Write IOPS : %.0f ops/s\n\n", iops;
         }'
-    
+
     # Read IOPS test - fixed to properly pass blocks variable to awk
     dd if="$iops_file" of=/dev/null bs=${bs_iops}K count=$blocks 2>&1 \
       | awk -v bs=${bs_iops} -v blocks=$blocks -F', ' '/copied/ {
@@ -612,13 +686,13 @@ probe_io() {
             printf "  Read  speed: %s\n", $4;
             printf "  Read  IOPS : %.0f ops/s\n\n", iops;
         }'
-    
+
     # cleanup
     rm -f "$speed_file" "$iops_file"
-    
+
     # need iostat
     command -v iostat &>/dev/null || { echo "iostat not found—install sysstat"; return 1; }
-    
+
     echo "-- Instantaneous I/O stats (1 s sample) --"
     iostat -x -m "$dev" 1 2 \
       | awk -v D="$dev" '
@@ -631,7 +705,7 @@ probe_io() {
           }
         '
     } | tee "$report"
-    
+
     echo "Report saved to $report"
 }
 
@@ -641,6 +715,12 @@ alias oplogin='tmux set-environment OP_SESSION_5VUOZKL7NZH4HJIUT6M4AYJT7I $(op s
 
 # register kernel in conda env for jupyter
 alias make_kernel=python -m ipykernel install --user --name $CONDA_DEFAULT_ENV --display-name "$CONDA_DEFAULT_ENV"
+
+alias mm=micromamba
+
+# local claude aliases
+alias lcc='ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_BASE_URL=http://localhost:11434 ANTHROPIC_API_KEY="" claude --model qwen3-coder'
+alias lcl='ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_BASE_URL=http://localhost:11434 ANTHROPIC_API_KEY="" claude --model qwen3:8b'
 
 # add local configurations
 if [ -f $HOME/.localrc ]; then source $HOME/.localrc; fi
@@ -747,4 +827,98 @@ pruntime() {
       fi
     fi
   fi
+}
+
+# net_by_user: per-UID Rx/Tx over a 1s window (or custom), tab-separated
+# Usage:
+#   net_by_user                # 1s, hide zeros
+#   net_by_user 5              # 5s, hide zeros
+#   net_by_user --all          # 1s, include zeros
+#   net_by_user 10 --min 512   # 10s, hide totals < 512 B/s
+# Notes:
+# - Works without root on typical Linux (reads ss -i per-socket stats).
+# - Aggregates TCP+UDP; sums bytes_received / bytes_acked per UID.
+# - Prints per-user Rx/Tx in human-readable B/s, sorted by total.
+net_by_user() {
+  local interval="1" show_all=0 min_bps=0
+  # tiny arg parser
+  for a in "$@"; do
+    case "$a" in
+      --all) show_all=1 ;;
+      --min) shift; min_bps="${1:-0}" ;;
+      ''|*[!0-9]*) : ;;   # ignore non-numeric non-flags
+      *) interval="$a" ;;
+    esac
+  done
+
+  _nbu_snapshot() {
+    # Emit: "<uid> <rx_bytes_total> <tx_bytes_total>"
+    { ss -tein 2>/dev/null; ss -uein 2>/dev/null; } \
+    | awk '
+      function flush() {
+        if (have_uid) { RX[uid]+=cur_rx; TX[uid]+=cur_tx }
+        cur_rx=0; cur_tx=0; have_uid=0
+      }
+      /^[[:space:]]*$/ { flush(); next }
+      /(^|[[:space:]])uid:[0-9]+/ {
+        for (i=1;i<=NF;i++) if ($i ~ /^uid:/) { split($i,a,":"); uid=a[2]+0; have_uid=1 }
+      }
+      /bytes_acked:/ {
+        for (i=1;i<=NF;i++) if ($i ~ /^bytes_acked:/) { split($i,a,":"); cur_tx += a[2]+0 }
+      }
+      /bytes_received:/ {
+        for (i=1;i<=NF;i++) if ($i ~ /^bytes_received:/) { split($i,a,":"); cur_rx += a[2]+0 }
+      }
+      /^[A-Z]|^tcp|^udp/ { if (have_uid || cur_rx>0 || cur_tx>0) flush() }
+      END { flush(); for (u in RX) printf "%d %lu %lu\n", u, RX[u]+0, TX[u]+0 }
+    '
+  }
+
+  local s1 s2
+  s1="$(_nbu_snapshot)"
+  printf "Sampling per-user network usage for %ss...\n" "$interval" >&2
+  sleep "$interval"
+  s2="$(_nbu_snapshot)"
+
+  # Combine snapshots with tags, then do all processing in one awk. Sort by total desc; strip key.
+  {
+    printf '%s\n' "$s1" | sed 's/^/S1 /'
+    printf '%s\n' "$s2" | sed 's/^/S2 /'
+  } | awk -v dt="$interval" -v show_all="$show_all" -v min_bps="$min_bps" '
+    # Read passwd once to map uid->username
+    BEGIN {
+      while ( ("getent passwd" | getline line) > 0 ) {
+        split(line, f, ":"); PW[f[3]] = f[1]
+      }
+      close("getent passwd")
+    }
+    # Human-readable binary units
+    function human(n,   u) {
+      if (n < 1024) return n "B/s"
+      n/=1024; if (n < 1024) return sprintf("%.1fKiB/s", n)
+      n/=1024; if (n < 1024) return sprintf("%.1fMiB/s", n)
+      n/=1024;                 return sprintf("%.1fGiB/s", n)
+    }
+    # load snapshots
+    /^S1 / {
+      uid=$2+0; RX1[uid]=$3+0; TX1[uid]=$4+0; U[uid]=1; next
+    }
+    /^S2 / {
+      uid=$2+0; RX2[uid]=$3+0; TX2[uid]=$4+0; U[uid]=1; next
+    }
+    END {
+      for (u in U) {
+        drx = (u in RX2 ? RX2[u] : 0) - (u in RX1 ? RX1[u] : 0); if (drx < 0) drx = 0
+        dtx = (u in TX2 ? TX2[u] : 0) - (u in TX1 ? TX1[u] : 0); if (dtx < 0) dtx = 0
+        rxps = drx / dt; txps = dtx / dt; tot = rxps + txps
+        if (!show_all && tot <= 0) continue
+        if (tot < min_bps) continue
+        user = (u in PW ? PW[u] : u)
+        # Stable, tab-separated, with a fixed-width numeric sort key first
+        printf "%020.0f\t%s\tRX:%s\tTX:%s\n", tot, user, human(rxps), human(txps)
+      }
+    }' \
+  | sort -r -n -k1,1 \
+  | cut -f2- \
+  | sed '/^[[:space:]]*$/d'   # paranoia: drop any empty line
 }
