@@ -67,35 +67,6 @@ if [ -d "$claude_src" ]; then
         ln -s "$src_file" "$dst_file"
     done
 
-    # Recreate the bin/tmux → hooks/tmux-cmux-shim symlink (not tracked in git)
-    mkdir -p "$claude_dst/bin"
-    if [ -L "$claude_dst/bin/tmux" ]; then
-        rm "$claude_dst/bin/tmux"
-    fi
-    ln -s "../hooks/tmux-cmux-shim" "$claude_dst/bin/tmux"
-    echo "  .claude/bin/tmux → ../hooks/tmux-cmux-shim"
-fi
-
-# --- MCP server setup ---
-echo "==> Setting up proxy-fetch MCP server"
-mcp_dir="$claude_dst/mcp-servers/proxy-fetch"
-if [ -d "$mcp_dir" ]; then
-    # Install Python dependencies
-    if command -v uv &>/dev/null; then
-        echo "  Running uv sync in $mcp_dir"
-        (cd "$mcp_dir" && uv sync)
-    else
-        echo "  WARNING: uv not found, skipping dependency install for proxy-fetch"
-    fi
-
-    # Register MCP server with Claude Code
-    if command -v claude &>/dev/null; then
-        echo "  Registering proxy-fetch MCP server"
-        claude mcp add -e SOCKS_PROXY=socks5://localhost:1080 -s user proxy-fetch -- \
-            uv run --directory "$mcp_dir" python server.py || true
-    else
-        echo "  WARNING: claude CLI not found, skipping MCP server registration"
-    fi
 fi
 
 echo "==> Done!"
