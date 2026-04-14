@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": []
   },
@@ -9,8 +12,28 @@
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": true,
+  "mcpServers": {
+    "notion": {
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_API_KEY": "ntn_I1154822049122O0oFdzID7qMbgVI7gjJC94JdSPXs594S"
+      }
+    },
+   "zotero": {
+     "command": "uvx",
+     "args": ["--from", "zotero-mcp-server", "zotero-mcp"],
+     "env": {
+       "ZOTERO_API_KEY": "imanbcQUyuGoGD71xPCFTar0M",
+       "ZOTERO_LIBRARY_ID": "7513302",
+       "ZOTERO_LIBRARY_TYPE": "user"
+     }
+   }
+  },
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  }
+      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "alwaysThinkingEnabled": true,
+  "includeCoAuthoredBy": false,
+  "skipDangerousModePermissionPrompt": true
 }
